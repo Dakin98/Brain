@@ -139,19 +139,74 @@ Ideation → Briefing → Creation → Review → R2L → Live → Testing → A
 
 ---
 
-## 🧠 Unsere Agents (AI-Team)
+## 🤖 Unser AI-Team (Bots & Agents)
 
-Wir nutzen interne AI-Agents für spezialisierte Aufgaben:
+Wir nutzen ein System aus spezialisierten AI-Agents, die jeweils für bestimmte Aufgaben optimiert sind. Jeder Agent hat einen eigenen Workspace, Memory und Skill-Set.
 
-| Agent | Aufgabe |
-|-------|---------|
-| **Brain** | Generalist, Koordination, persönliche Aufgaben |
-| **Ops** | ClickUp, Airtable, n8n, Automation, Onboarding |
-| **Meta Ads** | Kampagnen-Analyse, Benchmarking, Optimierung |
-| **LinkedIn** | Content-Ideen, Posts, Hook-Optimierung |
-| **Longform** | YouTube Scripts, Video-Struktur |
-| **Reels** | Short-Form Scripts, Viral Hooks |
-| **Newsletter** | Email-Kampagnen, Subject Lines |
+### Core Agents
+
+| Agent | ID | Zweck | Workspace |
+|-------|-----|-------|-----------|
+| **Brain** | `main` | 🧠 Generalist, Koordination, persönliche Aufgaben, Entscheidungen | `workspace/` |
+| **Ops** | `ops` | ⚙️ Agentur-Automatisierung, ClickUp, Airtable, n8n, Onboarding, Abrechnung | `workspace-ops/` |
+
+### Creative Agents
+
+| Agent | ID | Zweck | Workspace |
+|-------|-----|-------|-----------|
+| **LinkedIn** | `linkedin` | 💼 LinkedIn Content, Hooks, Posts, Algorithmus-Optimierung | `workspace-linkedin/` |
+| **Longform** | `longform` | 🎬 YouTube Scripts, Video-Struktur, Long-Form Content | `workspace-longform/` |
+| **Reels** | `reels` | 📱 Short-Form Video, TikTok, Reels, Viral Hooks | `workspace-reels/` |
+| **Newsletter** | `newsletter` | ✉️ Email-Marketing, Subject Lines, Content-Planung | `workspace-newsletter/` |
+
+### Specialist Agents
+
+| Agent | ID | Zweck | Workspace |
+|-------|-----|-------|-----------|
+| **Meta Ads** | `meta-ads` | 📊 Meta Ads Analyse, KPI-Benchmarking, Optimierungs-Empfehlungen | `meta-ads-agent/` |
+| **Skill Installer** | `skillinstaller` | 🔧 Skill-Installation mit Rate-Limit-Handling, Queue-Management | `workspace-skillinstaller/` |
+
+### Externe Bots & Integrationen
+
+| Bot | Plattform | Zweck |
+|-----|-----------|-------|
+| **@adsdrop_brainbot** | Telegram | Interne Alerts, Notifications, Quick Commands |
+
+### Agent-Routing
+
+Brain entscheidet, welcher Agent für welche Aufgabe zuständig ist:
+
+```
+Deniz: "ClickUp Task für Razeco erstellen"
+         ↓
+Brain erkennt: Ops-Thema
+         ↓
+Delegiert an: Ops Agent
+         ↓
+Ops: Task erstellt in ClickUp
+```
+
+```
+Deniz: "Analysiere diese Meta Ads Daten"
+         ↓
+Brain erkennt: Meta Ads Thema
+         ↓
+Delegiert an: Meta Ads Agent
+         ↓
+Meta Ads: Benchmark-Vergleich + Empfehlungen
+```
+
+### Verwendung
+
+```bash
+# Direkt via CLI
+openclaw agent --agent linkedin -m "Schreib einen LinkedIn Post über..."
+openclaw agent --agent meta-ads -m "Analysiere diese Kampagnendaten"
+openclaw agent --agent ops -m "Erstelle ClickUp Task für..."
+
+# Oder via Brain delegieren
+Brain, frag den Meta Ads Agent mal was er zu diesen Zahlen sagt...
+```
 
 ---
 
