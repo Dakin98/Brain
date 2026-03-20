@@ -1,0 +1,146 @@
+{
+  "name": "Content Engine - Claude Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "content-engine-generate",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "ClickUp Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "content-engine-generate"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract task ID from ClickUp webhook payload\nconst payload = $input.first().json.body;\n\n// ClickUp sends task ID in various formats\nlet taskId = null;\n\nif (payload.task_id) {\n  taskId = payload.task_id;\n} else if (payload.id) {\n  taskId = payload.id;\n} else if (payload.custom_id) {\n  taskId = payload.custom_id;\n}\n\nreturn [{\n  json: {\n    taskId: taskId,\n    status: payload.status?.status || 'unknown',\n    taskName: payload.name || 'Unknown'\n  }\n}];"
+      },
+      "id": "extract-task",
+      "name": "Extract Task ID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "status-check",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "claude generate",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ]
+        }
+      },
+      "id": "check-status",
+      "name": "Status = Claude Generate?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "command": "cd /Users/denizakin/.openclaw/workspace && python3 scripts/content_engine_generator.py --task-id {{ $json.taskId }}"
+      },
+      "id": "run-generator",
+      "name": "Run Content Generator",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [850, 200]
+    },
+    {
+      "parameters": {
+        "options": {},
+        "content": "=✅ Content generated for: {{ $('Extract Task ID').item.json.taskName }}"
+      },
+      "id": "success-response",
+      "name": "Success Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1050, 200]
+    },
+    {
+      "parameters": {
+        "options": {},
+        "content": "=⏭️ Status not 'claude generate', skipping"
+      },
+      "id": "skip-response",
+      "name": "Skip Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [850, 400]
+    }
+  ],
+  "connections": {
+    "ClickUp Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract Task ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Task ID": {
+      "main": [
+        [
+          {
+            "node": "Status = Claude Generate?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Status = Claude Generate?": {
+      "main": [
+        [
+          {
+            "node": "Run Content Generator",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Skip Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Content Generator": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": ["content-engine", "claude", "clickup"]
+}

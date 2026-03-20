@@ -1,0 +1,112 @@
+{
+  "briefing_id": "razeco_ug_2026-04-05",
+  "created_at": "2026-02-25T10:20:12.694202",
+  "status": "pending",
+  "client": {
+    "name": "Razeco UG",
+    "website": "https://razeco.de",
+    "target_audience": "E-Commerce",
+    "language": "de"
+  },
+  "topic": {
+    "name": "Before & After",
+    "date": "2026-04-05",
+    "briefing_instructions": "CALLOUT: A \"Before & After\" email is designed to showcase the transformative effects of a product. This type of email is meant to highlight the benefits of the product and how it has positively impacted the lives of customers. Here are some ideas for what to include in such an email:\nBULLET: Include \"before\" and \"after\" images or videos: Use images or videos to clearly show the difference that your product has made in the lives of your customers. This could be in the form of \"before\" and \"after\" photos or videos, or side-by-side comparisons.\nBULLET: Share customer testimonials: Include quotes or testimonials from customers describing their experience with your product. This will provide social proof and reinforce the effectiveness of your product.\nBULLET: Highlight key features and benefits: Make sure to highlight the key features and benefits of your product, and how it has made a positive impact on the lives of your customers.\nBULLET: Use storytelling: Use storytelling to show the journey of a customer before and after using your product. Make it relatable, and show how the problem has been solved by using your product.\nBULLET: Use of statistics: Use statistics to show the effectiveness of the product in question.\nThe goal of this email is to promote the product by highlighting its benefits and positive impact on customers. The email aims to showcase the transformative effects of the product through before and after images/videos, customer testimonials, highlighting key features and benefits, storytelling, and statistics. The aim is to persuade the customer to try the product and make a purchase, by providing social proof and emphasizing the positive impact it has had on others.",
+    "example_images": [
+      {
+        "url": "https://prod-files-secure.s3.us-west-2.amazonaws.com/c4896eae-3ca0-425d-ac01-cb9894fecce9/00877d67-4b82-440a-a38e-a7a2f1e43536/Screenshot_2023-02-23_at_19.48.30.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB4667MXP4IZM%2F20260225%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20260225T092009Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjED4aCXVzLXdlc3QtMiJGMEQCIEfEVBo6RHugChPvWmnKt4Rq1%2FKU5xmG3c2i%2FNyJffPgAiBQUb3Om389wyTRstPG0%2Bkz8BOM79JvQ3haXvMOqacvKCr%2FAwgHEAAaDDYzNzQyMzE4MzgwNSIM%2B5s0JuUAKFGVnu06KtwDn4E2jGh6DXg%2BVYxG9HUs%2F%2BTv6zFvJjYAXqiBKQ9kI0gRfP%2Fc3rbufpgQ13yvXJACtJoMHya%2BsCfvDKxcC3wcc0948hYxwMqx1XeLhi%2F2KL4v5tlJjt1gWoPcMM%2B1XhviUkv%2B10uStfVU6jpgvWb%2B4yEJy6fqczAU8XlKynNKyBovAHdsUpBlbnJvQuWLdMlhqitiy3fEXP9n5aZZMn2GgTcu3tSNqh1sDXIB9B1lSA0AYZ2icNJY9qwLUBCSI%2B2uNE1aCfefrRcQkcwZ6Tv1Dti9uLbRqR2seVPs3kZZg8xbGJv6hEHhlrZ6rtwg5s7PmSMH1j9soNSsEKgM2SdJNHU5rG%2FYZp04G6vevaLPRkfn%2BcexFR6NNECqwlNdEtC7R5MnyK2x2WFvHgSQLsNcXoq2ZVpaf9972OLUDOS7I%2BrFMv3Dmmhkp7CHqLsx1gbt0JEc9lc1GepJysiwOQ9glRb7w2mP67%2Bc07rsd0cAicnF5dqxEKum0ngF1y8pPffmMA5kAWF6GatjQFuRDkbNeRCIHVbFGy6KsU8zPU1tsVVP9rZhQQccvBf2sF2Revdl1VExebyBtSH3Oc7U%2FXtnxFH3g6j%2FKNoeq8f7bgneQEJIj5znXTeMeenVD58woKH6zAY6pgGRC3H750Xb5HkCjlaaI5sDOqURsd4pIVfZWdvTyw1OjhFMUEGdajfdV%2BdybCr%2FeeYLqslEAIQCvJ2024ecerb5wO%2FXsc%2FoCY3rnmlJ1%2BKYGSSB%2Blguz7QaKTH3sbgh9XjVs2WMX47l5vboeNplEe5%2BRNF2Qq%2Bn7rg2X8GkvoNPSloqlJ2zETNzgYxWzfSI%2FSF44ixr6y5zwwljTGtuMJ9pYsMDZUbL&X-Amz-Signature=66b3d2089c185a438792fe903e34c572e4b70e5e533fbbc533728e6dbfc5e1a9&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject",
+        "type": "example_email_design"
+      },
+      {
+        "url": "https://prod-files-secure.s3.us-west-2.amazonaws.com/c4896eae-3ca0-425d-ac01-cb9894fecce9/ed4df745-2c62-4cd5-9828-497cac2adf82/Screenshot_2023-02-23_at_19.54.05.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB4667MXP4IZM%2F20260225%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20260225T092009Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjED4aCXVzLXdlc3QtMiJGMEQCIEfEVBo6RHugChPvWmnKt4Rq1%2FKU5xmG3c2i%2FNyJffPgAiBQUb3Om389wyTRstPG0%2Bkz8BOM79JvQ3haXvMOqacvKCr%2FAwgHEAAaDDYzNzQyMzE4MzgwNSIM%2B5s0JuUAKFGVnu06KtwDn4E2jGh6DXg%2BVYxG9HUs%2F%2BTv6zFvJjYAXqiBKQ9kI0gRfP%2Fc3rbufpgQ13yvXJACtJoMHya%2BsCfvDKxcC3wcc0948hYxwMqx1XeLhi%2F2KL4v5tlJjt1gWoPcMM%2B1XhviUkv%2B10uStfVU6jpgvWb%2B4yEJy6fqczAU8XlKynNKyBovAHdsUpBlbnJvQuWLdMlhqitiy3fEXP9n5aZZMn2GgTcu3tSNqh1sDXIB9B1lSA0AYZ2icNJY9qwLUBCSI%2B2uNE1aCfefrRcQkcwZ6Tv1Dti9uLbRqR2seVPs3kZZg8xbGJv6hEHhlrZ6rtwg5s7PmSMH1j9soNSsEKgM2SdJNHU5rG%2FYZp04G6vevaLPRkfn%2BcexFR6NNECqwlNdEtC7R5MnyK2x2WFvHgSQLsNcXoq2ZVpaf9972OLUDOS7I%2BrFMv3Dmmhkp7CHqLsx1gbt0JEc9lc1GepJysiwOQ9glRb7w2mP67%2Bc07rsd0cAicnF5dqxEKum0ngF1y8pPffmMA5kAWF6GatjQFuRDkbNeRCIHVbFGy6KsU8zPU1tsVVP9rZhQQccvBf2sF2Revdl1VExebyBtSH3Oc7U%2FXtnxFH3g6j%2FKNoeq8f7bgneQEJIj5znXTeMeenVD58woKH6zAY6pgGRC3H750Xb5HkCjlaaI5sDOqURsd4pIVfZWdvTyw1OjhFMUEGdajfdV%2BdybCr%2FeeYLqslEAIQCvJ2024ecerb5wO%2FXsc%2FoCY3rnmlJ1%2BKYGSSB%2Blguz7QaKTH3sbgh9XjVs2WMX47l5vboeNplEe5%2BRNF2Qq%2Bn7rg2X8GkvoNPSloqlJ2zETNzgYxWzfSI%2FSF44ixr6y5zwwljTGtuMJ9pYsMDZUbL&X-Amz-Signature=ed9b883ee6ed50e948e62c0ff2a4db6d7f4ee9be1f0fb6cda578067ae20195e5&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject",
+        "type": "example_email_design"
+      },
+      {
+        "url": "https://prod-files-secure.s3.us-west-2.amazonaws.com/c4896eae-3ca0-425d-ac01-cb9894fecce9/60b118a3-0d07-4538-9112-d7a6d009070b/Screenshot_2023-02-23_at_19.49.26.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB4667MXP4IZM%2F20260225%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20260225T092009Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjED4aCXVzLXdlc3QtMiJGMEQCIEfEVBo6RHugChPvWmnKt4Rq1%2FKU5xmG3c2i%2FNyJffPgAiBQUb3Om389wyTRstPG0%2Bkz8BOM79JvQ3haXvMOqacvKCr%2FAwgHEAAaDDYzNzQyMzE4MzgwNSIM%2B5s0JuUAKFGVnu06KtwDn4E2jGh6DXg%2BVYxG9HUs%2F%2BTv6zFvJjYAXqiBKQ9kI0gRfP%2Fc3rbufpgQ13yvXJACtJoMHya%2BsCfvDKxcC3wcc0948hYxwMqx1XeLhi%2F2KL4v5tlJjt1gWoPcMM%2B1XhviUkv%2B10uStfVU6jpgvWb%2B4yEJy6fqczAU8XlKynNKyBovAHdsUpBlbnJvQuWLdMlhqitiy3fEXP9n5aZZMn2GgTcu3tSNqh1sDXIB9B1lSA0AYZ2icNJY9qwLUBCSI%2B2uNE1aCfefrRcQkcwZ6Tv1Dti9uLbRqR2seVPs3kZZg8xbGJv6hEHhlrZ6rtwg5s7PmSMH1j9soNSsEKgM2SdJNHU5rG%2FYZp04G6vevaLPRkfn%2BcexFR6NNECqwlNdEtC7R5MnyK2x2WFvHgSQLsNcXoq2ZVpaf9972OLUDOS7I%2BrFMv3Dmmhkp7CHqLsx1gbt0JEc9lc1GepJysiwOQ9glRb7w2mP67%2Bc07rsd0cAicnF5dqxEKum0ngF1y8pPffmMA5kAWF6GatjQFuRDkbNeRCIHVbFGy6KsU8zPU1tsVVP9rZhQQccvBf2sF2Revdl1VExebyBtSH3Oc7U%2FXtnxFH3g6j%2FKNoeq8f7bgneQEJIj5znXTeMeenVD58woKH6zAY6pgGRC3H750Xb5HkCjlaaI5sDOqURsd4pIVfZWdvTyw1OjhFMUEGdajfdV%2BdybCr%2FeeYLqslEAIQCvJ2024ecerb5wO%2FXsc%2FoCY3rnmlJ1%2BKYGSSB%2Blguz7QaKTH3sbgh9XjVs2WMX47l5vboeNplEe5%2BRNF2Qq%2Bn7rg2X8GkvoNPSloqlJ2zETNzgYxWzfSI%2FSF44ixr6y5zwwljTGtuMJ9pYsMDZUbL&X-Amz-Signature=f259647e1c63a3d14781ffa44e74d4d0c33c8fa4633faae9a9e0285e366de5f6&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject",
+        "type": "example_email_design"
+      }
+    ]
+  },
+  "brand": {
+    "colors": {
+      "hex_string": "#48413C, #696255, #0C5132, #F5F4F0, #ECEAE4, #C7C5BB, #BAB4A7",
+      "primary": "#48413C",
+      "secondary": "#696255",
+      "accent": "#0C5132"
+    },
+    "fonts": "DM Serif Display (headings), Plus Jakarta Sans (body), DM Sans (tagline)",
+    "tone": "Modern, eco-conscious, confident, slightly rebellious. Premium but accessible. German engineering meets Swiss design. Conversational but authoritative.",
+    "tagline": "shave the future.",
+    "logo_url": "https://d3k81ch9hvuctc.cloudfront.net/company/XjLDhQ/images/cf8d0958-9062-4a99-aea3-fe36c89695ae.png"
+  },
+  "products": {
+    "description": "",
+    "usps": "99% biobasiert\nTÜV Austria 4-Sterne zertifiziert (OK biobased)\nMade in Germany, Designed in Switzerland\nSchwedische Premium-Stahlklingen\nKeine Gelstreifen/Chemie (keine PEGs, Paraffine)\nErste Marke mit biobasierten Klingen weltweit\n99% weniger CO2 bei Entsorgung",
+    "top_products": "",
+    "social_proof": "12.000+ zufriedene Kunden\nTÜV Austria zertifiziert (4 Sterne)\nAs seen in: FAZ, Handelsblatt, Tagesspiegel\nLoved on TikTok",
+    "product_data": {
+      "system_razor_face": {
+        "title": "System Razor · Face",
+        "price": "24.99",
+        "currency": "EUR",
+        "url": "https://www.razeco.com/en-de/products/system-razor-face",
+        "img": "https://cdn.shopify.com/s/files/1/0892/0131/2077/files/face_razor_updated.png?v=1764876574",
+        "desc": "Biobasierte Klingen + Edelstahl-Griff. 1x Rasierer + 2 Klingenköpfe mit 5 Klingen & Backtrimmer."
+      },
+      "system_razor_body": {
+        "title": "System Razor · Body",
+        "price": "24.99",
+        "currency": "EUR",
+        "url": "https://www.razeco.com/en-de/products/system-razor-body",
+        "img": "https://cdn.shopify.com/s/files/1/0892/0131/2077/files/body_Razor_for_website_e079db2b-5f45-4c5b-bbf0-55b65257099c.png?v=1764877201",
+        "desc": "Biobasierte Klingen + Edelstahl-Griff. 1x Rasierer + 2 Klingenköpfe mit 5 Klingen & Backtrimmer."
+      },
+      "oneway_rose": {
+        "title": "Oneway Rosé",
+        "price_5pack": "3.99",
+        "price_20pack": "15.49",
+        "currency": "EUR",
+        "url": "https://www.razeco.com/en-de/products/oneway-rose",
+        "img": "https://cdn.shopify.com/s/files/1/0892/0131/2077/files/Razor_Single_Use2.png?v=1764877962",
+        "desc": "Plastikfreier Einwegrasierer. 3-10 Rasuren pro Stück."
+      },
+      "system_bundle": {
+        "title": "System Bundle",
+        "price": "37.96",
+        "currency": "EUR",
+        "url": "https://www.razeco.com/en-de/products/system-bundle",
+        "img": "https://cdn.shopify.com/s/files/1/0892/0131/2077/files/Frame1533211901.png?v=1764878250",
+        "desc": "5x Oneway + 1x Systemrasierer + 1x Refill-Pack. Spare 31%."
+      },
+      "refills_face": {
+        "title": "Face Refills",
+        "price_5pack": "22.49",
+        "price_10pack": "39.49",
+        "currency": "EUR",
+        "img": "https://cdn.shopify.com/s/files/1/0892/0131/2077/files/Razeco_Refills_face.png?v=1764877777",
+        "desc": "5x biobasierte Klingenköpfe mit je 5 Klingen."
+      },
+      "refills_body": {
+        "title": "Body Refills",
+        "price_5pack": "22.49",
+        "price_10pack": "39.49",
+        "currency": "EUR",
+        "img": "https://cdn.shopify.com/s/files/1/0892/0131/2077/files/Razeco_Refills_body_2e6f24f2-7177-4602-8b1e-815610f00042.png?v=1764877653",
+        "desc": "5x biobasierte Klingenköpfe mit je 5 Klingen."
+      }
+    }
+  },
+  "klaviyo": {
+    "api_key": "pk_dfc4dd8deb22827d0244a251f315db13c3",
+    "list_id": "ThKApp"
+  },
+  "output": {
+    "subject_line": "",
+    "preview_text": "",
+    "email_body_html": "",
+    "email_body_text": "",
+    "klaviyo_template_id": "",
+    "klaviyo_campaign_id": "",
+    "klaviyo_url": ""
+  }
+}

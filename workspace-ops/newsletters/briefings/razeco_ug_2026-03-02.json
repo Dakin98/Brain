@@ -1,0 +1,50 @@
+{
+  "briefing_id": "razeco_ug_2026-03-02",
+  "created_at": "2026-02-27T10:17:13.408863",
+  "status": "done",
+  "client": {
+    "name": "Razeco UG",
+    "website": "https://razeco.de",
+    "language": "de"
+  },
+  "topic": {
+    "name": "The No.1 Myth",
+    "date": "2026-03-02",
+    "briefing": "A \"The No.1 Myth\" email is a way to clear up misconceptions or false information about your product. This type of email is designed to address common misconceptions or misunderstandings that customers may have and to provide accurate information that will help them make an informed decision. Here are some ideas for what to include in such an email:\nDebunk common myths: Clear up any misconceptions or false information that customers may have about your product. This could be in the form of common myths or misunderstandings about your product.\nHighlight unique features: Highlight unique features of your product that sets it apart from competitors. This could be in the form of a comparison chart, or a side-by-side comparison of your product with others in the market.\nProvide educational content: Provide educational content that informs customers about the benefits and uses of your product. This could be in the form of tutorials, how-to guides, or educational videos.\nAddress customer concerns: Address any common concerns or questions that customers may have about your product.\nThe goal of this email is to clear up any misconceptions or false information about the product, and to provide accurate information to help customers make an informed decision. This is achieved by debunking common myths, highlighting unique features of the product, providing educational content, and addressing common customer concerns and questions."
+  },
+  "copy": {
+    "subject": "🚫 Der größte Mythos über biobasierte Rasierer",
+    "preview": "Warum 99% der Menschen falsch über nachhaltige Rasur denken",
+    "headline": "Biobasiert = schwach?",
+    "body": [
+      "Der größte Mythos über biobasierte Rasierer? Dass sie nicht so scharf oder langlebig sind wie herkömmliche.",
+      "",
+      "Bullshit.",
+      "",
+      "Unsere schwedischen Premium-Stahlklingen sind TÜV Austria 4-Sterne zertifiziert und rasieren genauso präzise wie jede konventionelle Klinge – nur ohne die Umweltbelastung.",
+      "",
+      "Der Unterschied liegt nicht in der Performance, sondern im Material:",
+      "",
+      "✓ 99% biobasiert statt Erdöl-Plastik",
+      "✓ Erste Marke mit biobasierten Klingen weltweit",
+      "✓ 99% weniger CO2 bei der Entsorgung",
+      "✓ Keine PEGs oder Paraffine im Gelstreifen",
+      "",
+      "12.000+ Kunden bestätigen: Die Rasur ist identisch. Der Impact ist revolutionär.",
+      "",
+      "Zeit, mit Vorurteilen aufzuräumen und die Zukunft zu rasieren."
+    ],
+    "cta": "Jetzt System Bundle holen →",
+    "closing": "Stay sharp,<br>Team Razeco",
+    "products_to_show": [
+      "system_bundle",
+      "system_razor_face"
+    ]
+  },
+  "klaviyo": {
+    "success": true,
+    "template_id": "S7SDNV",
+    "campaign_id": "01KJF66KY1Z58MKNJMWPMAETV1",
+    "url": "https://www.klaviyo.com/campaign/01KJF66KY1Z58MKNJMWPMAETV1/edit"
+  }
+}

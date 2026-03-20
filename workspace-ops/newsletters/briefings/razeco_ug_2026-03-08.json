@@ -1,0 +1,51 @@
+{
+  "briefing_id": "razeco_ug_2026-03-08",
+  "created_at": "2026-02-27T10:17:55.393675",
+  "status": "done",
+  "client": {
+    "name": "Razeco UG",
+    "website": "https://razeco.de",
+    "language": "de"
+  },
+  "topic": {
+    "name": "International Women's Day",
+    "date": "2026-03-08",
+    "briefing": "An \"International Women's Day\" email is a way to celebrate and acknowledge the achievements and importance of women in our lives. Here are some ideas for what to include in an \"International Women's Day\" email:\nInclude a quote or a message from a powerful women leader or famous personalities that can inspire the audience and create a sense of solidarity.\nShare messages of appreciation: Share messages of appreciation and gratitude for the women in your customers' lives, such as mothers, daughters, sisters, and friends.\nShare inspiring stories: Share inspiring stories of women who have overcome obstacles and achieved success in their personal and professional lives, that might be related to your niche.\nThe goal of the \"International Women's Day\" email is to celebrate and acknowledge the achievements and importance of women in our lives, inspire and create a sense of solidarity among the audience, express appreciation and gratitude towards the women in customers' lives, share inspiring stories of women who have overcome obstacles and achieved success, and to highlight the brand's support for women and its commitment towards promoting gender equality."
+  },
+  "copy": {
+    "subject": "🌸 Für die Frauen, die Geschichte schreiben",
+    "preview": "Heute feiern wir euch - und haben ein besonderes Geschenk vorbereitet.",
+    "headline": "Rebellinnen, Pionierinnen, Gamechangerinnen.",
+    "body": [
+      "Heute ist euer Tag. Der Tag aller Frauen, die Grenzen sprengen, Normen hinterfragen und die Welt ein Stück besser machen.",
+      "",
+      "Wie unsere Kundin Sarah aus Berlin, die als erste Frau in ihrem Ingenieursteam biobasierte Materialien durchgesetzt hat. Oder Lisa, die mit 50 ihr eigenes Startup gegründet hat - und dabei auf Nachhaltigkeit setzt.",
+      "",
+      "Bei razeco glauben wir: Die Zukunft ist weiblich. Deshalb entwickeln wir Produkte, die euren Werten entsprechen. 99% biobasiert, ohne Kompromisse bei der Performance.",
+      "",
+      "Weil ihr es verdient habt, Produkte zu nutzen, die genauso revolutionär sind wie ihr.",
+      "",
+      "✓ Erste biobasierte Klingen weltweit",
+      "✓ TÜV Austria 4-Sterne zertifiziert",
+      "✓ Made in Germany, designed in Switzerland",
+      "✓ 99% weniger CO2 bei der Entsorgung",
+      "",
+      "Heute gibt's 15% auf alles - für alle Frauen, die die Zukunft gestalten.",
+      "",
+      "Code: FUTURE15 (nur heute gültig)"
+    ],
+    "cta": "Jetzt 15% sparen →",
+    "closing": "Für eine nachhaltige Zukunft<br>Team razeco",
+    "products_to_show": [
+      "system_bundle",
+      "system_razor_face",
+      "oneway_rose"
+    ]
+  },
+  "klaviyo": {
+    "success": true,
+    "template_id": "RvsReE",
+    "campaign_id": "01KJF67WGPVZX2EFK7HQMRXG0R",
+    "url": "https://www.klaviyo.com/campaign/01KJF67WGPVZX2EFK7HQMRXG0R/edit"
+  }
+}

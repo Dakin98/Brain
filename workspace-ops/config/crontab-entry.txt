@@ -1,0 +1,8 @@
+# ClickUp Cold Mail Automation - Cron Entry
+# Füge diese Zeile zu crontab hinzu mit: crontab -e
+
+# Alle 10 Minuten prüfen
+*/10 * * * * /Users/denizakin/.openclaw/workspace/scripts/clickup-coldmail-cron.sh
+
+# Alternative: Alle 5 Minuten (für schnelleres Testing)
+# */5 * * * * /Users/denizakin/.openclaw/workspace/scripts/clickup-coldmail-cron.sh

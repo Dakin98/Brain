@@ -1,0 +1,128 @@
+{
+  "onboarding_tasks": [
+    {
+      "name": "🚀 Kickoff Call",
+      "offset_days": 0,
+      "description": "Erstgespräch mit dem Kunden. Ziele definieren, Erwartungen abstimmen, Briefing sammeln.\\n\\n⏱️ Dauer: 60-90 Min\\n👤 Assignee: Deniz",
+      "checklist": [
+        "Zugänge erhalten (Meta BM, Google Ads)",
+        "Ziele & KPIs besprochen",
+        "Budget & Laufzeit geklärt",
+        "Briefing-Fragen beantwortet",
+        "Nächste Schritte definiert",
+        "Termin für Tracking-Check vereinbart"
+      ]
+    },
+    {
+      "name": "🔍 Tracking Audit & Setup",
+      "offset_days": 1,
+      "description": "Alle Tracking-Systeme prüfen und sicherstellen, dass Conversions korrekt erfasst werden.\\n\\n⏱️ Dauer: 2-3h\\n👤 Assignee: Deniz",
+      "checklist": [
+        "GTM Container prüfen",
+        "Stape Server-Side Tracking einrichten",
+        "Meta Pixel firing korrekt",
+        "Meta CAPI (Conversions API) aktiv",
+        "GA4 Property verbunden",
+        "E-Commerce Events tracken",
+        "Test-Kauf durchgeführt"
+      ]
+    },
+    {
+      "name": "📊 Account Analysis",
+      "offset_days": 2,
+      "description": "Bestandsaufnahme: Was lief bisher? Winner & Loser identifizieren.\\n\\n⏱️ Dauer: 2-3h\\n👤 Assignee: Deniz",
+      "checklist": [
+        "Alte Ads exportieren (letzte 90 Tage)",
+        "Performance-Daten analysieren",
+        "Winner Creatives identifizieren",
+        "Loser Patterns erkennen",
+        "Audience Insights notieren",
+        "Wettbewerber-Research",
+        "Insights dokumentieren"
+      ]
+    },
+    {
+      "name": "💡 Creative Briefing",
+      "offset_days": 3,
+      "description": "Angles, Hooks & Konzepte für den ersten Batch definieren.\\n\\n⏱️ Dauer: 2-3h\\n👤 Assignee: Deniz",
+      "checklist": [
+        "Research-Ergebnisse auswerten",
+        "Kunden-Input zusammenfassen",
+        "3-5 Haupt-Angles definieren",
+        "Hooks pro Angle brainstormen",
+        "Format-Mix planen",
+        "Creative Plan mit Kunden abstimmen",
+        "Briefing für Creators erstellen"
+      ]
+    },
+    {
+      "name": "🎬 Creative Produktion (Batch 1)",
+      "offset_days": 5,
+      "description": "5 Creatives produzieren: Editing, Motion, Sound, Export.\\n\\n⏱️ Dauer: 3-5h\\n👤 Assignee: Deniz/VA",
+      "checklist": [
+        "Rohmaterial von Creators erhalten",
+        "Editing durchführen (VA/Freelancer)",
+        "Motion Graphics hinzufügen",
+        "Sound & Musik",
+        "Hooks/CTAs einfügen",
+        "Alle Formate exportieren",
+        "Quality Check durchführen"
+      ]
+    },
+    {
+      "name": "👁️ Kunden Review",
+      "offset_days": 8,
+      "description": "Creatives präsentieren, Feedback sammeln, Finalisierung.\\n\\n⏱️ Dauer: 1-2h\\n👤 Assignee: Deniz",
+      "checklist": [
+        "Preview-Links erstellen",
+        "Kunden-Präsentation vorbereiten",
+        "Feedback-Runde durchführen",
+        "Änderungen dokumentieren",
+        "Final Assets erstellen",
+        "Kunden-Approval einholen"
+      ]
+    },
+    {
+      "name": "🚀 Campaign Launch",
+      "offset_days": 10,
+      "description": "Ads live schalten: €50/Tag Test-Budget, Tracking prüfen.\\n\\n⏱️ Dauer: 1-2h\\n👤 Assignee: Deniz",
+      "checklist": [
+        "Campaign-Struktur aufbauen",
+        "Ad Sets mit Targeting erstellen",
+        "Creatives hochladen",
+        "Tracking-URLs prüfen",
+        "Budget: €50/Tag Test",
+        "Bidding-Strategie setzen",
+        "Ads aktivieren",
+        "Erste 24h Monitoring"
+      ]
+    },
+    {
+      "name": "📈 Performance Check (Tag 3)",
+      "offset_days": 13,
+      "description": "Erste Analyse nach 3 Tagen: Daten auswerten, erste Optimierungen.\\n\\n⏱️ Dauer: 1h\\n👤 Assignee: Deniz",
+      "checklist": [
+        "Spend, CTR, CPM checken",
+        "Pixel-Firing verifizieren",
+        "Erste Conversions beobachten",
+        "Creative Performance vergleichen",
+        "Budget-Adjustments",
+        "Learnings dokumentieren"
+      ]
+    },
+    {
+      "name": "🏆 Performance Check (Tag 7)",
+      "offset_days": 17,
+      "description": "Nach 7 Tagen: Winner identifizieren, Loser pausieren, Scale-Plan erstellen.\\n\\n⏱️ Dauer: 1-2h\\n👤 Assignee: Deniz",
+      "checklist": [
+        "ROAS/CPA pro Creative analysieren",
+        "Winners markieren (Scale) ✅",
+        "Losers identifizieren (Pause) ❌",
+        "Iterieren-Liste erstellen 🔁",
+        "Scale-Budget planen",
+        "Neue Batches briefen",
+        "Kunden-Update senden"
+      ]
+    }
+  ]
+}

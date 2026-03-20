@@ -1,0 +1,35 @@
+{
+  "briefing_id": "razeco_ug_2026-03-15",
+  "created_at": "2026-02-25T17:04:59.142578",
+  "status": "done",
+  "client": {
+    "name": "Razeco UG",
+    "website": "https://razeco.de",
+    "language": "de"
+  },
+  "topic": {
+    "name": "St. Patrick's day sale",
+    "date": "2026-03-15",
+    "briefing": "A \"St. Patrick's Day Sale\" email is a way for brands to promote special deals and discounts on products in celebration of St. Patrick's Day. This type of email is designed to entice customers to make a purchase by highlighting the savings they can take advantage of during the sale. Here are some ideas for what to include in a \"St. Patrick's Day Sale\" email:\nOffer a special deal: Offer a special deal or discount, such as a bundle or a percentage off, to incentivize customers to make a purchase & save on their purchase.\nUse festive language and imagery: Incorporate festive language and imagery related to St. Patrick's Day, such as green color schemes and shamrock graphics.\nHighlight best-sellers: Feature a selection of products that are your best-sellers.\nCreate a sense of urgency: Use language and design elements that create a sense of urgency. Mention limited stock or the end of the sale approaching to make the customer act fast.\nThe goal of this email is to promote a St. Patrick's Day Sale and encourage customers to make a purchase by offering special deals and discounts on products. The email aims to entice customers by highlighting the savings they can take advantage of during the sale, using festive language and imagery related to St. Patrick's Day, featuring best-selling products, and creating a sense of urgency by mentioning limited stock or the end of the sale approaching.\nExamples"
+  },
+  "copy": {
+    "subject": "🍀 St. Patrick's Day: Spare 12€ auf Premium Rasierer",
+    "preview": "Nur bis Mitternacht: Grün sparen mit Razeco!",
+    "headline": "Rasieren fürs Glück",
+    "body": [
+      "Grün ist die Farbe der Hoffnung – und die Hoffnung, beim Rasieren die Umwelt zu schonen, wird heute wahr!",
+      "Unsere biobasierten Rasierer sind nicht nur gut für deine Haut, sondern auch für unseren Planeten. Heute kannst du doppelt profitieren, denn wir feiern St. Patrick's Day mit einem exklusiven Angebot!",
+      "Sichere dir unser System Bundle – Face & Body – und spare 12€. Befreie dein Badezimmer von Chemie und entdecke die Kraft des schwedischen Premium-Stahls.",
+      "✓ 99% biobasiert und TÜV Austria 4-Sterne zertifiziert",
+      "✓ Made in Germany, Designed in Switzerland",
+      "✓ 99% weniger CO2 bei Entsorgung",
+      "Aber warte nicht zu lange – dieses Angebot endet heute um Mitternacht. Mach den ersten Schritt zu einem grüneren Morgen."
+    ],
+    "cta": "Jetzt zugreifen →",
+    "closing": "Bis bald im grünen Team<br>Razeco UG",
+    "products_to_show": [
+      "system_bundle",
+      "system_razor_face"
+    ]
+  }
+}

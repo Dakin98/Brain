@@ -1,0 +1,50 @@
+{
+  "briefing_id": "razeco_ug_2026-03-17",
+  "created_at": "2026-03-13T10:09:23.986975",
+  "status": "done",
+  "client": {
+    "name": "Razeco UG",
+    "website": "https://razeco.de",
+    "language": "de"
+  },
+  "topic": {
+    "name": "St. Patricks Day Sale follow-up",
+    "date": "2026-03-17",
+    "briefing": "A \"St. Patrick's Day Sale Follow-up\" email is a way for brands to remind customers of the current sale and the deals and discounts that are available for a limited time. This type of email is designed to create a sense of urgency and encourage customers to take advantage of the sale before it ends. Here are some ideas for what to include in a \"St. Patrick's Day Sale Follow-up\" email:\nRemind customers of the sale: Remind customers of the current St. Patrick's Day sale & savings.\nCreate a sense of urgency: Use language and design elements that create a sense of urgency. Mention limited stock or the end of the sale approaching to make the customer act fast.\nShare customer testimonials: Include quotes or testimonials from customers describing their experience with the sale or the business's products or services.\nThe goal of a \"St. Patrick's Day Sale Follow-up\" email is to remind customers of the current sale, create a sense of urgency, and encourage customers to take advantage of the available deals and discounts before the sale ends. The email aims to create urgency and encourage customers to act fast. The email may also include customer testimonials to help promote the sale and the business's products or services."
+  },
+  "copy": {
+    "subject": "⏰ Noch 6h: Dein grüner Deal läuft ab",
+    "preview": "St. Patrick's Day Sale endet heute Nacht - jetzt noch 24% sparen!",
+    "headline": "Letzte Chance: Grün rasieren",
+    "body": [
+      "Tick, tack. In 6 Stunden ist Schluss mit unserem St. Patrick's Day Deal.",
+      "",
+      "Während andere heute grünes Bier trinken, denkst du bereits weiter: An eine Zukunft ohne Plastik-Rasierer. An biobasierte Innovation. An echte Nachhaltigkeit.",
+      "",
+      "24% Rabatt auf alles – aber nur noch heute:",
+      "",
+      "✓ System Bundle für nur 28,85€ (statt 37,96€)",
+      "✓ 99% biobasiert, TÜV Austria 4-Sterne zertifiziert",
+      "✓ Made in Germany, schwedische Premium-Klingen",
+      "✓ 12.000+ Kunden können nicht irren",
+      "",
+      "Sarah aus München schreibt uns: 'Endlich ein Rasierer, bei dem ich kein schlechtes Gewissen haben muss. Die Rasur ist unglaublich sanft!'",
+      "",
+      "Um Mitternacht ist der Deal Geschichte. Genau wie die Plastik-Rasierer in deinem Badezimmer – wenn du jetzt handelst.",
+      "",
+      "Code: GREEN24"
+    ],
+    "cta": "Jetzt 24% sparen →",
+    "closing": "Grüne Grüße<br>Team Razeco",
+    "products_to_show": [
+      "system_bundle",
+      "system_razor_face"
+    ]
+  },
+  "klaviyo": {
+    "success": true,
+    "template_id": "SpdEBF",
+    "campaign_id": "01KKK7ABCAEB4ENCAV9GGTFRNC",
+    "url": "https://www.klaviyo.com/campaign/01KKK7ABCAEB4ENCAV9GGTFRNC/edit"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "anthropic/claude-3-7-opus-latest"
+      },
+      "models": {
+        "anthropic/claude-3-7-opus-latest": {}
+      }
+    }
+  }
+}

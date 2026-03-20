@@ -1,0 +1,75 @@
+{
+  "name": "✅ Paid Ads: Kunde → ClickUp Tasks",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "expression": "1"
+            }
+          ]
+        }
+      },
+      "name": "Daily 9am",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "baseId": "appbGhxy9I18oIS8E",
+        "tableId": "tbluuOSL8CTyIo0Ng",
+        "options": {
+          "filterByFormula": "AND({Status}='Active', FIND('Paid Ads', {Services}))"
+        }
+      },
+      "name": "Airtable: Neue Kunden",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.0,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.clickup.com/api/v2/space/90040311585/folder",
+        "sendBody": true,
+        "contentType": "json",
+        "body": {
+          "name": "={{ $json.fields.Firmenname }}"
+        },
+        "options": {}
+      },
+      "name": "HTTP: Folder erstellen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [700, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "const tasks = [\n  { name: '🚀 Kickoff Call', offset: 0 },\n  { name: '🔍 Tracking Audit', offset: 1 },\n  { name: '📊 Account Analysis', offset: 2 },\n  { name: '💡 Creative Briefing', offset: 3 },\n  { name: '🎬 Creative Produktion', offset: 5 },\n  { name: '👁️ Kunden Review', offset: 8 },\n  { name: '🚀 Campaign Launch', offset: 10 },\n  { name: '📈 Performance Tag 3', offset: 13 },\n  { name: '🏆 Performance Tag 7', offset: 17 }\n];\nconst now = new Date();\nreturn tasks.map(t => ({\n  json: {\n    name: t.name,\n    offset: t.offset,\n    dueDate: new Date(now.getTime() + t.offset * 86400000).getTime()\n  }\n}));"
+      },
+      "name": "Code: Tasks",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2.0,
+      "position": [900, 200]
+    }
+  ],
+  "connections": {
+    "Daily 9am": {
+      "main": [[{ "node": "Airtable: Neue Kunden", "type": "main", "index": 0 }]]
+    },
+    "Airtable: Neue Kunden": {
+      "main": [[{ "node": "HTTP: Folder erstellen", "type": "main", "index": 0 }]]
+    },
+    "HTTP: Folder erstellen": {
+      "main": [[{ "node": "Code: Tasks", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

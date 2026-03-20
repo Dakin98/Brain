@@ -1,0 +1,327 @@
+{
+  "name": "Weekly Newsletter Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weekday",
+              "mode": "every",
+              "triggerAtHour": 9,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "databaseId": "3465a32b-5659-4fd8-97c2-63984dbd89d9",
+        "returnAll": true,
+        "options": {}
+      },
+      "name": "Get Notion Topics",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [420, 200],
+      "credentials": {
+        "notionApi": {
+          "id": "notion-api",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "value": "appbGhxy9I18oIS8E",
+          "mode": "id"
+        },
+        "table": {
+          "value": "Kunden",
+          "mode": "id"
+        },
+        "options": {
+          "filterByFormula": "AND(OR(Status='Aktiv',Status='Onboarding'),{Klaviyo API Key}!='')"
+        }
+      },
+      "name": "Get Airtable Clients",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [420, 400],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "airtable-api",
+          "name": "Airtable API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter topics for next 14 days\nconst today = new Date();\nconst dateStart = new Date(today);\nconst dateEnd = new Date(today);\ndateEnd.setDate(dateEnd.getDate() + 14);\n\nconst allEntries = $input.all();\nconst weekEntries = [];\n\nfor (const entry of allEntries) {\n  const props = entry.json.properties;\n  const dateProp = props?.Date?.date;\n  \n  if (!dateProp || !dateProp.start) continue;\n  \n  const entryDate = new Date(dateProp.start);\n  const mappedDate = new Date(today.getFullYear(), entryDate.getMonth(), entryDate.getDate());\n  \n  if (mappedDate >= dateStart && mappedDate <= dateEnd) {\n    const name = props?.Name?.title?.map(t => t.plain_text).join('') || '';\n    const types = props?.['Email Type']?.multi_select?.map(s => s.name) || [];\n    \n    weekEntries.push({\n      name: name,\n      date: mappedDate.toISOString().split('T')[0],\n      types: types,\n      pageId: entry.json.id\n    });\n  }\n}\n\nweekEntries.sort((a, b) => new Date(a.date) - new Date(b.date));\n\n// Store in workflow static data for cross-node access\nreturn weekEntries.map(entry => ({\n  json: { type: 'topic', data: entry }\n}));"
+      },
+      "name": "Filter Topics",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [620, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "const records = $input.all();\n\nconst clients = records.map(record => ({\n  id: record.json.id,\n  firmenname: record.json.fields?.Firmenname || '',\n  klaviyoKey: record.json.fields?.['Klaviyo API Key'] || '',\n  website: record.json.fields?.Website || '',\n  branche: record.json.fields?.Branche || '',\n  tonalitaet: record.json.fields?.Tonalität || '',\n  emailFrom: record.json.fields?.['E-Mail Rechnungen'] || 'hello@adsdrop.de'\n})).filter(c => c.klaviyoKey);\n\nreturn clients.map(client => ({\n  json: { type: 'client', data: client }\n}));"
+      },
+      "name": "Parse Clients",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [620, 400]
+    },
+    {
+      "parameters": {
+        "mergeBy": ["always"],
+        "options": {}
+      },
+      "name": "Merge Data",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [820, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\n// Separate topics and clients by type field\nconst topics = items\n  .filter(i => i.json.type === 'topic')\n  .map(i => i.json.data);\n\nconst clients = items\n  .filter(i => i.json.type === 'client')\n  .map(i => i.json.data);\n\nif (topics.length === 0 || clients.length === 0) {\n  throw new Error(`Missing data: ${topics.length} topics, ${clients.length} clients`);\n}\n\n// Create all combinations\nconst combinations = [];\nfor (const client of clients) {\n  for (const topic of topics) {\n    combinations.push({\n      json: {\n        topic: topic,\n        client: client,\n        comboId: `${client.id}_${topic.date}`\n      }\n    });\n  }\n}\n\nreturn combinations;"
+      },
+      "name": "Create Combos",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1020, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst client = item.client;\nconst topic = item.topic;\n\nif (!client.website) {\n  return [{\n    json: {\n      ...item,\n      websiteHtml: '',\n      websiteError: 'No website URL'\n    }\n  }];\n}\n\ntry {\n  const response = await $httpRequest({\n    method: 'GET',\n    url: client.website,\n    timeout: 10000,\n    options: { redirect: 'follow' }\n  });\n  \n  return [{\n    json: {\n      ...item,\n      websiteHtml: typeof response === 'string' ? response : response.body || ''\n    }\n  }];\n} catch (error) {\n  return [{\n    json: {\n      ...item,\n      websiteHtml: '',\n      websiteError: error.message\n    }\n  }];\n}"
+      },
+      "name": "Fetch Website",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1220, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst client = item.client;\nconst topic = item.topic;\nconst html = (item.websiteHtml || '').toLowerCase();\n\n// Product categories\nconst keywords = {\n  'Mode': ['kleidung', 'fashion', 'bekleidung', 'outfit', 'style'],\n  'Beauty': ['kosmetik', 'beauty', 'pflege', 'makeup', 'serum'],\n  'Home': ['möbel', 'home', 'wohnen', 'einrichtung', 'deko'],\n  'Tech': ['technik', 'gadgets', 'elektronik', 'smart'],\n  'Food': ['food', 'essen', 'kulinarik', 'gourmet', 'kaffee'],\n  'Sport': ['sport', 'fitness', 'training', 'workout'],\n  'Jewelry': ['schmuck', 'jewelry', 'uhren']\n};\n\nconst products = Object.entries(keywords)\n  .filter(([_, words]) => words.some(w => html.includes(w)))\n  .map(([cat]) => cat);\n\nconst finalProducts = products.length > 0 ? products : ['Produkte'];\n\n// Tone detection\nconst luxury = ['luxus', 'premium', 'exklusiv', 'hochwertig', 'edel'].filter(w => html.includes(w)).length;\nconst casual = ['mega', 'super', 'cool', 'easy', 'lässig'].filter(w => html.includes(w)).length;\n\nlet tone = 'standard';\nif (luxury > 2) tone = 'luxury';\nelse if (casual > 2) tone = 'casual';\n\n// USP\nconst uspWords = ['nachhaltig', 'bio', 'vegan', 'handmade', 'regional', 'fair'];\nconst usp = uspWords.find(w => html.includes(w)) || 'Qualität und Service';\n\n// Greeting\nlet greeting;\nif (tone === 'luxury') greeting = `Willkommen in der Welt von ${client.firmenname}`;\nelse if (tone === 'casual') greeting = 'Hey! Schön, dass du da bist';\nelse greeting = `Hallo von ${client.firmenname}`;\n\nconst productName = finalProducts[0];\n\nreturn [{\n  json: {\n    ...item,\n    analysis: {\n      products: finalProducts,\n      tone: tone,\n      usp: usp,\n      greeting: greeting,\n      subject: `${topic.name} | ${client.firmenname}`,\n      previewText: `Neue ${productName} entdecken`,\n      hook: `Unsere ${productName} überzeugen durch ${usp}.`,\n      context: `Bei uns findest du ${finalProducts.join(', ')} mit ${usp}.`,\n      guarantee: html.includes('versand') ? 'Kostenloser Versand ab 50€' : '30 Tage Rückgabe',\n      ctaText: `${productName} entdecken`\n    }\n  }\n}];"
+      },
+      "name": "Analyze Content",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1420, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst client = item.client;\nconst topic = item.topic;\nconst analysis = item.analysis;\n\nconst emailHtml = `<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>${topic.name}</title>\n</head>\n<body style=\"font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.7; color: #222; max-width: 600px; margin: 0 auto; padding: 0;\">\n\n<div style=\"display: none; max-height: 0; overflow: hidden;\">${analysis.previewText}</div>\n\n<div style=\"background: #000; color: #fff; padding: 40px 30px; text-align: center;\">\n<h1 style=\"font-size: 28px; margin: 0 0 10px 0; font-weight: 600;\">${client.firmenname}</h1>\n<p style=\"font-size: 14px; margin: 0; opacity: 0.8; text-transform: uppercase; letter-spacing: 2px;\">${topic.name}</p>\n</div>\n\n<div style=\"padding: 40px 30px;\">\n<p style=\"font-size: 18px; margin-bottom: 30px; font-weight: 500;\">${analysis.greeting},</p>\n\n<p style=\"font-size: 16px; line-height: 1.7; margin-bottom: 25px; color: #444;\">\nwir haben etwas Besonderes für dich: <strong>${topic.name}</strong>. ${analysis.hook}\n</p>\n\n<div style=\"background: #fafafa; padding: 30px; border-radius: 8px; margin: 30px 0;\">\n<h2 style=\"font-size: 20px; margin-top: 0; margin-bottom: 20px; color: #111;\">Das erwartet dich:</h2>\n<p>Entdecke die neuesten Highlights bei ${client.firmenname}.</p>\n</div>\n\n<p style=\"font-size: 15px; line-height: 1.7; color: #555;\">${analysis.context}</p>\n</div>\n\n<div style=\"background: #f5f5f5; padding: 40px 30px; text-align: center;\">\n<p style=\"font-size: 16px; margin-bottom: 20px; color: #333;\">Bereit für ${analysis.products[0]}?</p>\n<a href=\"${client.website}\" style=\"display: inline-block; background: #000; color: #fff; padding: 16px 40px; text-decoration: none; border-radius: 4px; font-weight: 600; font-size: 15px; text-transform: uppercase; letter-spacing: 1px;\">${analysis.ctaText} →</a>\n<p style=\"font-size: 13px; color: #888; margin-top: 20px;\">${analysis.guarantee}</p>\n</div>\n\n<div style=\"padding: 30px; text-align: center; color: #999; font-size: 12px; border-top: 1px solid #eee;\">\n<p style=\"margin: 0 0 10px 0;\"><strong style=\"color: #333;\">${client.firmenname}</strong></p>\n<p style=\"margin: 15px 0;\"><a href=\"${client.website}\" style=\"color: #666;\">${client.website}</a></p>\n<p style=\"margin: 20px 0 0 0; font-size: 11px; color: #bbb;\">Du erhältst diese E-Mail, weil du bei ${client.firmenname} eingekauft hast.</p>\n</div>\n\n</body>\n</html>`;\n\nreturn [{\n  json: {\n    ...item,\n    emailHtml: emailHtml,\n    subject: analysis.subject,\n    previewText: analysis.previewText\n  }\n}];"
+      },
+      "name": "Generate Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1620, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst client = item.client;\n\ntry {\n  const response = await $httpRequest({\n    method: 'GET',\n    url: 'https://a.klaviyo.com/api/lists',\n    headers: {\n      'Authorization': `Klaviyo-API-Key ${client.klaviyoKey}`,\n      'revision': '2024-10-15'\n    }\n  });\n  \n  const lists = response.body?.data || [];\n  let targetList = lists[0]?.id;\n  \n  for (const list of lists) {\n    const name = list.attributes?.name?.toLowerCase() || '';\n    if (name.includes('newsletter') || name.includes('main') || name.includes('all')) {\n      targetList = list.id;\n      break;\n    }\n  }\n  \n  return [{\n    json: {\n      ...item,\n      targetList: targetList\n    }\n  }];\n} catch (error) {\n  return [{\n    json: {\n      ...item,\n      targetList: null,\n      listError: error.message\n    }\n  }];\n}"
+      },
+      "name": "Get Klaviyo Lists",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1820, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst client = item.client;\nconst topic = item.topic;\nconst analysis = item.analysis;\nconst subject = item.subject;\nconst targetList = item.targetList;\n\n// Calculate send date\nconst topicDate = topic.date;\nconst today = new Date();\nlet sendDate;\n\nif (topicDate) {\n  const topicDt = new Date(topicDate);\n  if (topicDt < today) {\n    sendDate = new Date(topicDt);\n    sendDate.setDate(sendDate.getDate() + 7);\n  } else {\n    sendDate = topicDt;\n  }\n} else {\n  sendDate = new Date(today);\n  sendDate.setDate(sendDate.getDate() + 1);\n}\n\nconst sendDatetime = sendDate.toISOString().split('T')[0] + 'T09:00:00.000Z';\n\nconst campaignData = {\n  data: {\n    type: 'campaign',\n    attributes: {\n      name: subject,\n      audiences: { included: targetList ? [targetList] : [] },\n      send_strategy: {\n        method: 'static',\n        options_static: { datetime: sendDatetime }\n      },\n      'campaign-messages': {\n        data: [{\n          type: 'campaign-message',\n          attributes: {\n            channel: 'email',\n            label: subject.slice(0, 50),\n            content: {\n              subject: subject,\n              preview_text: analysis.previewText\n            }\n          }\n        }]\n      }\n    }\n  }\n};\n\ntry {\n  const response = await $httpRequest({\n    method: 'POST',\n    url: 'https://a.klaviyo.com/api/campaigns',\n    headers: {\n      'Authorization': `Klaviyo-API-Key ${client.klaviyoKey}`,\n      'revision': '2024-10-15',\n      'Content-Type': 'application/json'\n    },\n    body: campaignData\n  });\n  \n  return [{\n    json: {\n      client: client,\n      topic: topic,\n      subject: subject,\n      campaignId: response.body?.data?.id,\n      status: 'Created',\n      sendDate: sendDate.toISOString().split('T')[0]\n    }\n  }];\n} catch (error) {\n  return [{\n    json: {\n      client: client,\n      topic: topic,\n      subject: subject,\n      campaignId: null,\n      status: 'Failed',\n      error: error.message\n    }\n  }];\n}"
+      },
+      "name": "Create Campaign",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2020, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = $input.all();\n\nconst campaigns = results.map(r => r.json);\nconst successful = campaigns.filter(c => c.campaignId).length;\nconst failed = campaigns.length - successful;\n\nconst clientSummary = {};\nfor (const camp of campaigns) {\n  if (!clientSummary[camp.client?.firmenname]) {\n    clientSummary[camp.client?.firmenname] = 0; }\n  if (camp.campaignId) clientSummary[camp.client?.firmenname]++;\n}\n\nreturn [{\n  json: {\n    successful,\n    failed,\n    total: campaigns.length,\n    campaigns,\n    clientSummary,\n    reportDate: new Date().toLocaleDateString('de-DE')\n  }\n}];"
+      },
+      "name": "Aggregate Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2220, 300]
+    },
+    {
+      "parameters": {
+        "chatId": "6607099798",
+        "text": "=📧 *Newsletter-Vorbereitung abgeschlossen!*\n\n*Woche:* {{ $json.reportDate }}\n*Ergebnis:* ✅ {{ $json.successful }} Campaigns erstellt | ❌ {{ $json.failed }} Fehler\n\n*Übersicht pro Kunde:*\n{{ Object.entries($json.clientSummary).map(([name, count]) => `• ${name}: ${count} Drafts`).join('\n') }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "name": "Send Telegram Report",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [2420, 300]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Notion Topics",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Airtable Clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Notion Topics": {
+      "main": [
+        [
+          {
+            "node": "Filter Topics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Airtable Clients": {
+      "main": [
+        [
+          {
+            "node": "Parse Clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Topics": {
+      "main": [
+        [
+          {
+            "node": "Merge Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Clients": {
+      "main": [
+        [
+          {
+            "node": "Merge Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Data": {
+      "main": [
+        [
+          {
+            "node": "Create Combos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Combos": {
+      "main": [
+        [
+          {
+            "node": "Fetch Website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Website": {
+      "main": [
+        [
+          {
+            "node": "Analyze Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Content": {
+      "main": [
+        [
+          {
+            "node": "Generate Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Email": {
+      "main": [
+        [
+          {
+            "node": "Get Klaviyo Lists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Klaviyo Lists": {
+      "main": [
+        [
+          {
+            "node": "Create Campaign",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Campaign": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Results": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  }
+}

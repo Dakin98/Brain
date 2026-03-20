@@ -1,0 +1,249 @@
+{
+  "name": "Paid Ads: Kunde → ClickUp Tasks (Korrigiert)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "expression": "1"
+            }
+          ]
+        }
+      },
+      "name": "Daily 9am",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "baseId": "appbGhxy9I18oIS8E",
+        "tableId": "tbluuOSL8CTyIo0Ng",
+        "options": {
+          "filterByFormula": "AND({Status}='Active', FIND('Paid Ads', {Services}), OR({ClickUp Folder ID}='', {ClickUp Folder ID}=BLANK()))"
+        }
+      },
+      "name": "Airtable: Neue Kunden",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.0,
+      "position": [450, 300],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "YOUR_AIRTABLE_CREDENTIAL",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-1",
+              "leftValue": "={{ $json.records.length }}",
+              "rightValue": "0",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "name": "Kunden gefunden?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.0,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.clickup.com/api/v2/space/90040311585/folder",
+        "sendBody": true,
+        "contentType": "json",
+        "body": {
+          "name": "={{ $json.fields.Firmenname }}"
+        },
+        "options": {}
+      },
+      "name": "HTTP: Folder erstellen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [850, 200],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "YOUR_CLICKUP_AUTH",
+          "name": "ClickUp Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "baseId": "appbGhxy9I18oIS8E",
+        "tableId": "tbluuOSL8CTyIo0Ng",
+        "id": "={{ $json.id }}",
+        "fields": {
+          "ClickUp Folder ID": "={{ $node['HTTP: Folder erstellen'].json.id }}"
+        }
+      },
+      "name": "Airtable: Folder ID speichern",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.0,
+      "position": [1050, 200],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "YOUR_AIRTABLE_CREDENTIAL",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://api.clickup.com/api/v2/folder/' + $node['HTTP: Folder erstellen'].json.id + '/list' }}",
+        "sendBody": true,
+        "contentType": "json",
+        "body": {
+          "name": "📝 Creative Pipeline"
+        },
+        "options": {}
+      },
+      "name": "HTTP: Liste erstellen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1250, 200],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "YOUR_CLICKUP_AUTH",
+          "name": "ClickUp Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const kunde = $input.first().json.fields.Firmenname;\nconst listId = $node['HTTP: Liste erstellen'].json.id;\n\nconst tasks = [\n  { name: '🚀 Kickoff Call', offset: 0, desc: 'Erstgespräch mit ' + kunde },\n  { name: '🔍 Tracking Audit', offset: 1, desc: 'GTM, Pixel, CAPI prüfen' },\n  { name: '📊 Account Analysis', offset: 2, desc: 'Bestandsaufnahse' },\n  { name: '💡 Creative Briefing', offset: 3, desc: 'Hooks & Angles' },\n  { name: '🎬 Creative Produktion', offset: 5, desc: '5 Creatives produzieren' },\n  { name: '👁️ Kunden Review', offset: 8, desc: 'Feedback & Approval' },\n  { name: '🚀 Campaign Launch', offset: 10, desc: '€50/Tag Test' },\n  { name: '📈 Performance Tag 3', offset: 13, desc: 'Erste Analyse' },\n  { name: '🏆 Performance Tag 7', offset: 17, desc: 'Final: Winner/Loser' }\n];\n\nconst now = new Date();\nreturn tasks.map(task => {\n  const due = new Date(now);\n  due.setDate(due.getDate() + task.offset);\n  return {\n    json: {\n      name: task.name + ' — ' + kunde,\n      description: task.desc,\n      listId: listId,\n      dueDate: due.getTime(),\n      kunde: kunde\n    }\n  };\n});"
+      },
+      "name": "Code: Tasks generieren",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2.0,
+      "position": [1450, 200]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3.0,
+      "position": [1650, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://api.clickup.com/api/v2/list/' + $json.listId + '/task' }}",
+        "sendBody": true,
+        "contentType": "json",
+        "body": {
+          "name": "={{ $json.name }}",
+          "description": "={{ $json.description }}",
+          "due_date": "={{ $json.dueDate }}",
+          "assignees": [63066979]
+        },
+        "options": {}
+      },
+      "name": "HTTP: Task erstellen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1850, 200],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "YOUR_CLICKUP_AUTH",
+          "name": "ClickUp Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_CHAT_ID",
+        "text": "✅ Neuer Paid Ads Kunde: {{ $node['Code: Tasks generieren'].json.kunde }} - 9 Tasks erstellt!",
+        "additionalFields": {}
+      },
+      "name": "Telegram: Erfolg",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [2050, 200],
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_CHAT_ID",
+        "text": "❌ Keine neuen Paid Ads Kunden gefunden.",
+        "additionalFields": {}
+      },
+      "name": "Telegram: Keine Kunden",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [850, 400],
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Daily 9am": {
+      "main": [[{ "node": "Airtable: Neue Kunden", "type": "main", "index": 0 }]]
+    },
+    "Airtable: Neue Kunden": {
+      "main": [[{ "node": "Kunden gefunden?", "type": "main", "index": 0 }]]
+    },
+    "Kunden gefunden?": {
+      "main": [
+        [{ "node": "HTTP: Folder erstellen", "type": "main", "index": 0 }],
+        [{ "node": "Telegram: Keine Kunden", "type": "main", "index": 0 }]
+      ]
+    },
+    "HTTP: Folder erstellen": {
+      "main": [[{ "node": "Airtable: Folder ID speichern", "type": "main", "index": 0 }]]
+    },
+    "Airtable: Folder ID speichern": {
+      "main": [[{ "node": "HTTP: Liste erstellen", "type": "main", "index": 0 }]]
+    },
+    "HTTP: Liste erstellen": {
+      "main": [[{ "node": "Code: Tasks generieren", "type": "main", "index": 0 }]]
+    },
+    "Code: Tasks generieren": {
+      "main": [[{ "node": "Split In Batches", "type": "main", "index": 0 }]]
+    },
+    "Split In Batches": {
+      "main": [[{ "node": "HTTP: Task erstellen", "type": "main", "index": 0 }]]
+    },
+    "HTTP: Task erstellen": {
+      "main": [[{ "node": "Split In Batches", "type": "main", "index": 0 }]]
+    },
+    "Telegram: Keine Kunden": {
+      "main": [[{ "node": "Telegram: Erfolg", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

@@ -1,0 +1,271 @@
+{
+  "name": "Weekly Newsletter AI Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weekday",
+              "mode": "every",
+              "triggerAtHour": 9,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [200, 400]
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "databaseId": "3465a32b-5659-4fd8-97c2-63984dbd89d9",
+        "returnAll": true
+      },
+      "name": "Get Notion Topics",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [400, 300],
+      "credentials": {
+        "notionApi": {
+          "id": "notion-creds",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const today = new Date();\nconst dateStart = new Date(today);\nconst dateEnd = new Date(today);\ndateEnd.setDate(dateEnd.getDate() + 14);\n\nconst entries = $input.all();\nconst filtered = [];\n\nfor (const entry of entries) {\n  const props = entry.json.properties;\n  const dateProp = props?.Date?.date;\n  \n  if (!dateProp || !dateProp.start) continue;\n  \n  const entryDate = new Date(dateProp.start);\n  const mappedDate = new Date(today.getFullYear(), entryDate.getMonth(), entryDate.getDate());\n  \n  if (mappedDate >= dateStart && mappedDate <= dateEnd) {\n    filtered.push({\n      json: {\n        pageId: entry.json.id,\n        name: props?.Name?.title?.map(t => t.plain_text).join('') || '',\n        date: mappedDate.toISOString().split('T')[0],\n        types: props?.['Email Type']?.multi_select?.map(s => s.name) || []\n      }\n    });\n  }\n}\n\nreturn filtered;"
+      },
+      "name": "Filter This Week",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [600, 300]
+    },
+    {
+      "parameters": {
+        "operation": "getChildren",
+        "pageId": "={{ $json.pageId }}",
+        "returnAll": true
+      },
+      "name": "Get Page Blocks",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [800, 300],
+      "credentials": {
+        "notionApi": {
+          "id": "notion-creds",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst topicInfo = items.find(i => i.json.pageId)?.json;\n\nif (!topicInfo) {\n  return [{ json: { error: 'No topic info found' } }];\n}\n\nconst blocks = items.filter(i => i.json.type && !i.json.pageId);\nconst contentParts = [];\n\nfor (const block of blocks) {\n  const type = block.json.type;\n  let text = '';\n  \n  if (type === 'paragraph') {\n    text = block.json.paragraph?.rich_text?.map(t => t.plain_text).join('');\n  } else if (type === 'bulleted_list_item') {\n    text = '• ' + block.json.bulleted_list_item?.rich_text?.map(t => t.plain_text).join('');\n  } else if (type === 'numbered_list_item') {\n    text = block.json.numbered_list_item?.rich_text?.map(t => t.plain_text).join('');\n  } else if (type === 'heading_1') {\n    text = '# ' + block.json.heading_1?.rich_text?.map(t => t.plain_text).join('');\n  } else if (type === 'heading_2') {\n    text = '## ' + block.json.heading_2?.rich_text?.map(t => t.plain_text).join('');\n  } else if (type === 'heading_3') {\n    text = '### ' + block.json.heading_3?.rich_text?.map(t => t.plain_text).join('');\n  } else if (type === 'quote') {\n    text = '> ' + block.json.quote?.rich_text?.map(t => t.plain_text).join('');\n  } else if (type === 'callout') {\n    text = '💡 ' + block.json.callout?.rich_text?.map(t => t.plain_text).join('');\n  } else if (type === 'image') {\n    const caption = block.json.image?.caption?.map(t => t.plain_text).join('') || 'Image';\n    text = `[BILD: ${caption}]`;\n  }\n  \n  if (text.trim()) {\n    contentParts.push(text);\n  }\n}\n\nreturn [{\n  json: {\n    ...topicInfo,\n    notionContent: contentParts.join('\\n\\n'),\n    contentParts: contentParts\n  }\n}];"
+      },
+      "name": "Parse Notion Content",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1000, 300]
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "value": "appbGhxy9I18oIS8E",
+          "mode": "id"
+        },
+        "table": {
+          "value": "Kunden",
+          "mode": "id"
+        },
+        "options": {
+          "filterByFormula": "AND(OR(Status='Aktiv',Status='Onboarding'),{Klaviyo API Key}!='')"
+        }
+      },
+      "name": "Get Airtable Clients",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [400, 600],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "airtable-creds",
+          "name": "Airtable API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const records = $input.all();\n\nreturn records.map(r => ({\n  json: {\n    id: r.json.id,\n    firmenname: r.json.fields?.Firmenname || '',\n    klaviyoKey: r.json.fields?.['Klaviyo API Key'] || '',\n    website: r.json.fields?.Website || '',\n    branche: r.json.fields?.Branche || '',\n    tonalitaet: r.json.fields?.Tonalität || '',\n    emailFrom: r.json.fields?.['E-Mail Rechnungen'] || 'hello@adsdrop.de'\n  }\n})).filter(c => c.json.klaviyoKey);"
+      },
+      "name": "Format Clients",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [600, 600]
+    },
+    {
+      "parameters": {
+        "mergeBy": ["always"],
+        "options": {}
+      },
+      "name": "Merge Topics & Clients",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [1200, 450]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst topics = items.filter(i => i.json.notionContent).map(i => i.json);\nconst clients = items.filter(i => i.json.klaviyoKey && !i.json.notionContent).map(i => i.json);\n\nif (topics.length === 0) throw new Error('No topics with content found');\nif (clients.length === 0) throw new Error('No clients found');\n\nconst combos = [];\nfor (const client of clients) {\n  for (const topic of topics) {\n    combos.push({\n      json: {\n        comboId: `${client.id}_${topic.pageId}`,\n        topic: topic,\n        client: client\n      }\n    });\n  }\n}\n\nreturn combos;"
+      },
+      "name": "Create Combinations",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1400, 450]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [1600, 450]
+    },
+    {
+      "parameters": {
+        "jsCode": "const combo = $input.first().json;\nconst client = combo.client;\n\nif (!client.website) {\n  return [{\n    json: {\n      ...combo,\n      websiteAnalysis: null,\n      websiteError: 'No website URL'\n    }\n  }];\n}\n\ntry {\n  const resp = await $httpRequest({\n    method: 'GET',\n    url: client.website,\n    timeout: 15000,\n    options: { redirect: 'follow' }\n  });\n  \n  const html = (typeof resp === 'string' ? resp : resp.body || '').toLowerCase();\n  \n  const products = [];\n  const keywords = {\n    'Mode': ['kleidung', 'fashion', 'bekleidung', 'outfit', 'style'],\n    'Beauty': ['kosmetik', 'beauty', 'pflege', 'makeup', 'hautpflege'],\n    'Home': ['möbel', 'home', 'wohnen', 'einrichtung', 'deko', 'interior'],\n    'Tech': ['technik', 'gadgets', 'elektronik', 'smart', 'digital'],\n    'Food': ['food', 'essen', 'kulinarik', 'gourmet', 'kaffee', 'snacks'],\n    'Sport': ['sport', 'fitness', 'training', 'workout', 'active'],\n    'Jewelry': ['schmuck', 'jewelry', 'uhren', 'accessoires']\n  };\n  \n  for (const [cat, words] of Object.entries(keywords)) {\n    if (words.some(w => html.includes(w))) products.push(cat);\n  }\n  \n  const luxury = ['luxus', 'premium', 'exklusiv', 'hochwertig', 'edel', 'elegant'].filter(w => html.includes(w)).length;\n  const casual = ['mega', 'super', 'cool', 'easy', 'entspannt', 'lässig', 'geil'].filter(w => html.includes(w)).length;\n  \n  let tone = 'standard';\n  if (luxury > 2) tone = 'luxury';\n  else if (casual > 2) tone = 'casual';\n  \n  const uspWords = ['nachhaltig', 'bio', 'vegan', 'handmade', 'regional', 'fair', 'öko', 'sustainable'];\n  const usp = uspWords.find(w => html.includes(w)) || 'Qualität und Service';\n  \n  const guarantee = html.includes('versand') && html.includes('kostenlos') \n    ? 'Kostenloser Versand' \n    : html.includes('rückgabe') \n      ? '30 Tage Rückgabe' \n      : 'Kundenzufriedenheit garantiert';\n  \n  return [{\n    json: {\n      ...combo,\n      websiteAnalysis: {\n        products: products.length > 0 ? products : ['Produkte'],\n        mainProduct: products[0] || 'Produkte',\n        tone: tone,\n        usp: usp,\n        guarantee: guarantee,\n        hasShippingInfo: html.includes('versand'),\n        hasReturnsInfo: html.includes('rückgabe') || html.includes('retoure')\n      }\n    }\n  }];\n} catch (error) {\n  return [{\n    json: {\n      ...combo,\n      websiteAnalysis: {\n        products: ['Produkte'],\n        mainProduct: 'Produkte',\n        tone: 'standard',\n        usp: 'Qualität und Service',\n        guarantee: 'Kundenzufriedenheit'\n      },\n      websiteError: error.message\n    }\n  }];\n}"
+      },
+      "name": "Analyze Website",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1800, 450]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Notion Topics",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Airtable Clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Notion Topics": {
+      "main": [
+        [
+          {
+            "node": "Filter This Week",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter This Week": {
+      "main": [
+        [
+          {
+            "node": "Get Page Blocks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Page Blocks": {
+      "main": [
+        [
+          {
+            "node": "Parse Notion Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Airtable Clients": {
+      "main": [
+        [
+          {
+            "node": "Format Clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Notion Content": {
+      "main": [
+        [
+          {
+            "node": "Merge Topics & Clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Clients": {
+      "main": [
+        [
+          {
+            "node": "Merge Topics & Clients",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Topics & Clients": {
+      "main": [
+        [
+          {
+            "node": "Create Combinations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Combinations": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches": {
+      "main": [
+        [
+          {
+            "node": "Analyze Website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  }
+}

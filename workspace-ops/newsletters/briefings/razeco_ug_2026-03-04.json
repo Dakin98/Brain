@@ -1,0 +1,54 @@
+{
+  "briefing_id": "razeco_ug_2026-03-04",
+  "created_at": "2026-02-27T10:17:27.951497",
+  "status": "done",
+  "client": {
+    "name": "Razeco UG",
+    "website": "https://razeco.de",
+    "language": "de"
+  },
+  "topic": {
+    "name": "Tips & Tricks",
+    "date": "2026-03-04",
+    "briefing": "A \"Tips & Tricks\" email is a type of email that provides useful and actionable advice to help customers get the most out of a product. The goal of this email is to educate and empower customers by providing them with tips & tricks they might not know. Here are some ideas for what to include in a \"Tips & Tricks\" email:\nProduct tips and tricks: Provide tips and tricks on how to use your product more effectively. This could include shortcuts, hidden features, tricks, or ways to customize the product to meet individual needs or unlock secret product potential.\nHow-to guides: Include step-by-step instructions or tutorials on how to perform those tricks or unlock the hidden features, and use cases.\nBest practices: Share best practices that will help customers make the most of their purchase.\nUse images and infographics: Use images and infographics to make the information more engaging and easy to understand.\nThe goal of a \"Tips & Tricks\" email is to educate and empower customers by providing them with useful and actionable advice to help them get the most out of a product. The email aims to provide tips and tricks on how to use the product more effectively, how-to guides, best practices, and visually appealing elements such as images and infographics to make the information easier to understand and retain."
+  },
+  "copy": {
+    "subject": "🔥 Dein Rasierer kann mehr als du denkst",
+    "preview": "3 Profi-Tricks für die perfekte Rasur (Trick #2 wird dich überraschen)",
+    "headline": "Rasur-Hacks, die alles ändern",
+    "body": [
+      "Weißt du, was der Unterschied zwischen einer guten und einer perfekten Rasur ist?",
+      "",
+      "Es sind die kleinen Tricks, die niemand kennt. Die Geheimnisse, die Barbiere seit Generationen weitergeben.",
+      "",
+      "Heute verrate ich dir 3 Profi-Hacks, die deine Rasur revolutionieren werden:",
+      "",
+      "**TRICK #1: Die 30-Sekunden-Regel**",
+      "Lass warmes Wasser 30 Sekunden über die Klinge laufen, bevor du rasierst. Die schwedischen Premium-Stahlklingen werden so optimal temperiert und gleiten wie Butter über die Haut.",
+      "",
+      "**TRICK #2: Der Winkel-Hack**",
+      "Halte deinen biobasierten Rasierer in einem 30°-Winkel zur Haut. Nicht flach, nicht steil. Dieser Winkel nutzt die präzise deutsche Ingenieurskunst optimal aus.",
+      "",
+      "**TRICK #3: Die Zwei-Pass-Methode**",
+      "Erster Pass: Mit der Wuchsrichtung. Zweiter Pass: Quer zur Wuchsrichtung. Niemals gegen die Wuchsrichtung bei empfindlicher Haut.",
+      "",
+      "Bonus-Tipp: Spüle die Klinge nach jedem Zug aus. Unsere chemiefreien Klingen ohne Gelstreifen bleiben so länger scharf.",
+      "",
+      "Diese Tricks funktionieren perfekt mit unserem TÜV Austria zertifizierten System. 12.000+ Kunden schwören bereits darauf.",
+      "",
+      "Ready für die beste Rasur deines Lebens?"
+    ],
+    "cta": "System jetzt holen →",
+    "closing": "Stay sharp,<br>Team Razeco",
+    "products_to_show": [
+      "system_bundle",
+      "system_razor_face"
+    ]
+  },
+  "klaviyo": {
+    "success": true,
+    "template_id": "YfqRvg",
+    "campaign_id": "01KJF6720C4NFD8096FWM206XM",
+    "url": "https://www.klaviyo.com/campaign/01KJF6720C4NFD8096FWM206XM/edit"
+  }
+}

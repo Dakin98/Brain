@@ -1,0 +1,322 @@
+{
+  "name": "Meta Ads Reporting → Google Sheets",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtDay": 1,
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "cron-trigger",
+      "name": "Monatlicher Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0],
+      "notes": "Läuft am 1. jeden Monats um 08:00. Zieht Daten vom Vormonat."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Berechne Vormonat\nconst now = new Date();\nconst year = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();\nconst month = now.getMonth() === 0 ? 12 : now.getMonth();\nconst monthStr = String(month).padStart(2, '0');\nconst lastDay = new Date(year, month, 0).getDate();\n\nconst accounts = [\n  { id: 'act_1538907656986107', name: 'Razeco UG' },\n  { id: 'act_1162322016047465', name: 'Deniz Akin' }\n];\n\nconst output = [];\nfor (const acc of accounts) {\n  output.push({\n    json: {\n      account_id: acc.id,\n      account_name: acc.name,\n      since: `${year}-${monthStr}-01`,\n      until: `${year}-${monthStr}-${lastDay}`,\n      monat: `${year}-${monthStr}`\n    }\n  });\n}\n\nreturn output;"
+      },
+      "id": "calc-dates",
+      "name": "Vormonat berechnen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 0],
+      "notes": "Berechnet den Vormonat + iteriert über beide Ad Accounts"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://graph.facebook.com/v21.0/{{ $json.account_id }}/insights",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "level", "value": "campaign" },
+            { "name": "fields", "value": "campaign_id,campaign_name,status,spend,impressions,reach,frequency,clicks,ctr,cpm,actions,action_values,cost_per_action_type" },
+            { "name": "time_range", "value": "={{ JSON.stringify({since: $json.since, until: $json.until}) }}" },
+            { "name": "limit", "value": "500" },
+            { "name": "filtering", "value": "=[{\"field\":\"spend\",\"operator\":\"GREATER_THAN\",\"value\":\"0\"}]" }
+          ]
+        },
+        "options": {
+          "pagination": {
+            "paginationMode": "responseContainsNextURL",
+            "nextURL": "={{ $response.body.paging?.next }}"
+          }
+        }
+      },
+      "id": "meta-campaigns",
+      "name": "Meta API: Campaigns",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, -150],
+      "notes": "Zieht Campaign-Level Insights. Auth: Query Auth mit access_token.",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "META_TOKEN_CREDENTIAL_ID",
+          "name": "Meta Access Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://graph.facebook.com/v21.0/{{ $json.account_id }}/insights",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "level", "value": "adset" },
+            { "name": "fields", "value": "campaign_id,campaign_name,adset_id,adset_name,status,spend,impressions,reach,frequency,clicks,ctr,cpm,actions,cost_per_action_type,targeting" },
+            { "name": "time_range", "value": "={{ JSON.stringify({since: $json.since, until: $json.until}) }}" },
+            { "name": "limit", "value": "500" },
+            { "name": "filtering", "value": "=[{\"field\":\"spend\",\"operator\":\"GREATER_THAN\",\"value\":\"0\"}]" }
+          ]
+        },
+        "options": {
+          "pagination": {
+            "paginationMode": "responseContainsNextURL",
+            "nextURL": "={{ $response.body.paging?.next }}"
+          }
+        }
+      },
+      "id": "meta-adsets",
+      "name": "Meta API: Ad Sets",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 0],
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "META_TOKEN_CREDENTIAL_ID",
+          "name": "Meta Access Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://graph.facebook.com/v21.0/{{ $json.account_id }}/insights",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "level", "value": "ad" },
+            { "name": "fields", "value": "campaign_name,adset_name,ad_id,ad_name,status,spend,impressions,clicks,ctr,cpc,cpm,actions,cost_per_action_type,video_30_sec_watched_actions,video_p25_watched_actions,video_p50_watched_actions,video_p75_watched_actions,video_p100_watched_actions,video_play_actions" },
+            { "name": "time_range", "value": "={{ JSON.stringify({since: $json.since, until: $json.until}) }}" },
+            { "name": "limit", "value": "500" },
+            { "name": "filtering", "value": "=[{\"field\":\"spend\",\"operator\":\"GREATER_THAN\",\"value\":\"0\"}]" }
+          ]
+        },
+        "options": {
+          "pagination": {
+            "paginationMode": "responseContainsNextURL",
+            "nextURL": "={{ $response.body.paging?.next }}"
+          }
+        }
+      },
+      "id": "meta-ads",
+      "name": "Meta API: Creatives",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 150],
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "META_TOKEN_CREDENTIAL_ID",
+          "name": "Meta Access Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst monat = items[0]?.json?.monat || 'unknown';\nconst account = items[0]?.json?.account_name || 'unknown';\n\nconst rows = [];\nfor (const item of items) {\n  const d = item.json.data || [item.json];\n  for (const row of (Array.isArray(d) ? d : [d])) {\n    if (!row.campaign_id) continue;\n    const conversions = (row.actions || []).find(a => a.action_type === 'offsite_conversion.fb_pixel_purchase' || a.action_type === 'purchase');\n    const costPerConv = (row.cost_per_action_type || []).find(a => a.action_type === 'offsite_conversion.fb_pixel_purchase' || a.action_type === 'purchase');\n    const revenue = (row.action_values || []).find(a => a.action_type === 'offsite_conversion.fb_pixel_purchase' || a.action_type === 'purchase');\n    const spend = parseFloat(row.spend || 0);\n    const rev = parseFloat(revenue?.value || 0);\n    rows.push({\n      json: {\n        values: [[\n          monat,\n          account,\n          row.campaign_id,\n          row.campaign_name,\n          row.status || '',\n          spend,\n          parseInt(row.impressions || 0),\n          parseInt(row.reach || 0),\n          parseFloat(row.frequency || 0),\n          parseInt(row.clicks || 0),\n          parseFloat(row.ctr || 0),\n          parseFloat(row.cpm || 0),\n          parseInt(conversions?.value || 0),\n          parseFloat(costPerConv?.value || 0),\n          spend > 0 ? (rev / spend).toFixed(2) : 0\n        ]]\n      }\n    });\n  }\n}\nreturn rows;"
+      },
+      "id": "transform-campaigns",
+      "name": "Transform: Campaigns",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, -150]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst monat = items[0]?.json?.monat || 'unknown';\nconst account = items[0]?.json?.account_name || 'unknown';\n\nconst rows = [];\nfor (const item of items) {\n  const d = item.json.data || [item.json];\n  for (const row of (Array.isArray(d) ? d : [d])) {\n    if (!row.adset_id) continue;\n    const conversions = (row.actions || []).find(a => a.action_type === 'offsite_conversion.fb_pixel_purchase' || a.action_type === 'purchase');\n    const costPerConv = (row.cost_per_action_type || []).find(a => a.action_type === 'offsite_conversion.fb_pixel_purchase' || a.action_type === 'purchase');\n    const targeting = row.targeting ? JSON.stringify(row.targeting).substring(0, 200) : '';\n    rows.push({\n      json: {\n        values: [[\n          monat,\n          account,\n          row.campaign_id,\n          row.campaign_name,\n          row.adset_id,\n          row.adset_name,\n          row.status || '',\n          targeting,\n          '',\n          parseFloat(row.spend || 0),\n          parseInt(row.impressions || 0),\n          parseInt(row.reach || 0),\n          parseFloat(row.frequency || 0),\n          parseInt(row.clicks || 0),\n          parseFloat(row.ctr || 0),\n          parseFloat(row.cpm || 0),\n          parseInt(conversions?.value || 0),\n          parseFloat(costPerConv?.value || 0)\n        ]]\n      }\n    });\n  }\n}\nreturn rows;"
+      },
+      "id": "transform-adsets",
+      "name": "Transform: Ad Sets",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst monat = items[0]?.json?.monat || 'unknown';\nconst account = items[0]?.json?.account_name || 'unknown';\n\nconst rows = [];\nfor (const item of items) {\n  const d = item.json.data || [item.json];\n  for (const row of (Array.isArray(d) ? d : [d])) {\n    if (!row.ad_id) continue;\n    const conversions = (row.actions || []).find(a => a.action_type === 'offsite_conversion.fb_pixel_purchase' || a.action_type === 'purchase');\n    const videoPlays = (row.video_play_actions || []).find(a => a.action_type === 'video_view');\n    const video3s = (row.video_30_sec_watched_actions || []);\n    const thruplay = (row.video_p100_watched_actions || []).find(a => a.action_type === 'video_view');\n    const impressions = parseInt(row.impressions || 0);\n    const plays = parseInt(videoPlays?.value || 0);\n    const hookRate = impressions > 0 ? ((plays / impressions) * 100).toFixed(1) : '';\n    const holdRate = plays > 0 && thruplay ? ((parseInt(thruplay.value) / plays) * 100).toFixed(1) : '';\n    rows.push({\n      json: {\n        values: [[\n          monat,\n          account,\n          row.campaign_name,\n          row.adset_name,\n          row.ad_id,\n          row.ad_name,\n          row.status || '',\n          '',\n          '',\n          '',\n          parseFloat(row.spend || 0),\n          impressions,\n          parseInt(row.clicks || 0),\n          parseFloat(row.ctr || 0),\n          parseFloat(row.cpc || 0),\n          parseFloat(row.cpm || 0),\n          parseInt(videoPlays?.value || 0),\n          parseInt(thruplay?.value || 0),\n          hookRate,\n          holdRate\n        ]]\n      }\n    });\n  }\n}\nreturn rows;"
+      },
+      "id": "transform-ads",
+      "name": "Transform: Creatives",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 150]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1XTMtZwPRQVR7pRZv2ZZQC_pC5_61JIhkclOsCn1uESA",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Campaigns",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {}
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "sheets-campaigns",
+      "name": "Google Sheets: Campaigns",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [940, -150],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1XTMtZwPRQVR7pRZv2ZZQC_pC5_61JIhkclOsCn1uESA",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Ad Sets",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {}
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "sheets-adsets",
+      "name": "Google Sheets: Ad Sets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [940, 0],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1XTMtZwPRQVR7pRZv2ZZQC_pC5_61JIhkclOsCn1uESA",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Creatives",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {}
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "sheets-creatives",
+      "name": "Google Sheets: Creatives",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [940, 150],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Monatlicher Trigger": {
+      "main": [
+        [{ "node": "Vormonat berechnen", "type": "main", "index": 0 }]
+      ]
+    },
+    "Vormonat berechnen": {
+      "main": [
+        [
+          { "node": "Meta API: Campaigns", "type": "main", "index": 0 },
+          { "node": "Meta API: Ad Sets", "type": "main", "index": 0 },
+          { "node": "Meta API: Creatives", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Meta API: Campaigns": {
+      "main": [
+        [{ "node": "Transform: Campaigns", "type": "main", "index": 0 }]
+      ]
+    },
+    "Meta API: Ad Sets": {
+      "main": [
+        [{ "node": "Transform: Ad Sets", "type": "main", "index": 0 }]
+      ]
+    },
+    "Meta API: Creatives": {
+      "main": [
+        [{ "node": "Transform: Creatives", "type": "main", "index": 0 }]
+      ]
+    },
+    "Transform: Campaigns": {
+      "main": [
+        [{ "node": "Google Sheets: Campaigns", "type": "main", "index": 0 }]
+      ]
+    },
+    "Transform: Ad Sets": {
+      "main": [
+        [{ "node": "Google Sheets: Ad Sets", "type": "main", "index": 0 }]
+      ]
+    },
+    "Transform: Creatives": {
+      "main": [
+        [{ "node": "Google Sheets: Creatives", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    { "name": "Meta Ads" },
+    { "name": "Reporting" }
+  ]
+}

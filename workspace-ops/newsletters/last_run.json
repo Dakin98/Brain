@@ -1,0 +1,55 @@
+{
+  "run_date": "2026-02-27T10:17:57.092748",
+  "week_offset": 1,
+  "dry_run": false,
+  "topics_count": 4,
+  "clients_count": 1,
+  "successful": 4,
+  "total": 4,
+  "results": [
+    {
+      "success": true,
+      "client": "Razeco UG",
+      "topic": "The No.1 Myth",
+      "date": "2026-03-02",
+      "subject": "🚫 Der größte Mythos über biobasierte Rasierer",
+      "html_file": "razeco_ug_2026-03-02_the_no.1_myth.html",
+      "template_id": "S7SDNV",
+      "campaign_id": "01KJF66KY1Z58MKNJMWPMAETV1",
+      "url": "https://www.klaviyo.com/campaign/01KJF66KY1Z58MKNJMWPMAETV1/edit"
+    },
+    {
+      "success": true,
+      "client": "Razeco UG",
+      "topic": "Tips & Tricks",
+      "date": "2026-03-04",
+      "subject": "🔥 Dein Rasierer kann mehr als du denkst",
+      "html_file": "razeco_ug_2026-03-04_tips__tricks.html",
+      "template_id": "YfqRvg",
+      "campaign_id": "01KJF6720C4NFD8096FWM206XM",
+      "url": "https://www.klaviyo.com/campaign/01KJF6720C4NFD8096FWM206XM/edit"
+    },
+    {
+      "success": true,
+      "client": "Razeco UG",
+      "topic": "What to expect from the brand",
+      "date": "2026-03-06",
+      "subject": "Was dich bei uns erwartet ⚡",
+      "html_file": "razeco_ug_2026-03-06_what_to_expect_from_the_brand.html",
+      "template_id": "XhSMv5",
+      "campaign_id": "01KJF67EGMSBZFY2KKAK9TJG9B",
+      "url": "https://www.klaviyo.com/campaign/01KJF67EGMSBZFY2KKAK9TJG9B/edit"
+    },
+    {
+      "success": true,
+      "client": "Razeco UG",
+      "topic": "International Women's Day",
+      "date": "2026-03-08",
+      "subject": "🌸 Für die Frauen, die Geschichte schreiben",
+      "html_file": "razeco_ug_2026-03-08_international_womens_day.html",
+      "template_id": "RvsReE",
+      "campaign_id": "01KJF67WGPVZX2EFK7HQMRXG0R",
+      "url": "https://www.klaviyo.com/campaign/01KJF67WGPVZX2EFK7HQMRXG0R/edit"
+    }
+  ]
+}

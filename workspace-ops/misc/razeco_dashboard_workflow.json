@@ -1,0 +1,89 @@
+{
+  "name": "Razeco - Monatliches Performance Dashboard Update",
+  "settings": {
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "callerPolicy": "any",
+    "errorWorkflow": ""
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "minutesUTC": 0,
+              "hoursUTC": 0
+            }
+          ]
+        }
+      },
+      "id": "c67e1a88-baec-4114-99a9-a880c9d3954c",
+      "name": "Schedule Trigger (am 1. jeden Monats)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "execute",
+        "script": "/**\n * Updates the Razeco Performance Dashboard with the latest data\n */\nfunction main() {\n  // Spreadsheet ID für das Dashboard\n  var spreadsheetId = '19s3l4JgQz5U6jw3lgvO9LHlKGvDdzQPpEKMeteqnUqY';\n  var ss = SpreadsheetApp.openById(spreadsheetId);\n  \n  // Holen Sie das aktuelle Datum und den vorherigen Monat\n  var now = new Date();\n  var previousMonth = new Date();\n  previousMonth.setMonth(previousMonth.getMonth() - 1);\n  \n  var monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',\n                    'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];\n  var previousMonthName = monthNames[previousMonth.getMonth()];\n  \n  // Update des Zeitstempels im Dashboard\n  var dashboardSheet = ss.getSheetByName('Dashboard');\n  dashboardSheet.getRange('B2').setValue(now).setNumberFormat('dd.MM.yyyy');\n  \n  // Update des Zeitplans\n  var scheduleSheet = ss.getSheetByName('Update Schedule');\n  var lastRow = scheduleSheet.getLastRow();\n  \n  for (var i = 2; i <= lastRow; i++) {\n    scheduleSheet.getRange(i, 2).setValue(now); // Letzte Aktualisierung\n    \n    // Nächste Aktualisierung auf den ersten Tag des nächsten Monats setzen\n    var nextMonth = new Date();\n    nextMonth.setMonth(nextMonth.getMonth() + 1);\n    nextMonth.setDate(1); // Erster Tag des nächsten Monats\n    scheduleSheet.getRange(i, 3).setValue(nextMonth);\n  }\n  \n  // In einer echten Implementierung würden hier API-Aufrufe an Werbe-Plattformen erfolgen,\n  // um die Daten des Vormonats abzurufen\n  \n  // Hier simulieren wir Beispieldaten für die Demonstration\n  addSampleData(ss, previousMonthName);\n  \n  return { success: true, message: \"Dashboard aktualisiert für \" + previousMonthName };\n}\n\n/**\n * Fügt Beispieldaten für den angegebenen Monat hinzu\n */\nfunction addSampleData(ss, month) {\n  var creativesSheet = ss.getSheetByName('Creatives KPIs');\n  var adSetsSheet = ss.getSheetByName('Ad Sets KPIs');\n  \n  // Bestehende Daten für diesen Monat löschen (falls vorhanden)\n  clearExistingData(creativesSheet, month);\n  clearExistingData(adSetsSheet, month);\n  \n  // Beispieldaten für Creatives\n  var creativesData = [\n    [month, 'Facebook', 'Sommer-Sale', 'CR001', 'Hautpflege-Video', '9:16', 125000, 3200, 0.0256, 0.45, 1440, 52, 27.69, 3.2, 4608],\n    [month, 'Facebook', 'Sommer-Sale', 'CR002', 'Produktvorstellung', '1:1', 98000, 2100, 0.0214, 0.51, 1071, 38, 28.18, 2.8, 2999],\n    [month, 'Instagram', 'Neukunden', 'CR003', 'Testimonial Sarah', '4:5', 156000, 4800, 0.0308, 0.38, 1824, 63, 28.95, 3.5, 6384],\n    [month, 'Google', 'Remarketing', 'CR004', 'Rabatt-Banner', '16:9', 45000, 980, 0.0218, 0.65, 637, 22, 28.95, 2.9, 1847],\n    [month, 'TikTok', 'Brand-Awareness', 'CR005', 'Challenge-Video', '9:16', 210000, 5400, 0.0257, 0.42, 2268, 41, 55.32, 1.9, 4309]\n  ];\n  \n  // Beispieldaten für Ad Sets\n  var adSetsData = [\n    [month, 'Facebook', 'Sommer-Sale', 'AS001', 'Lookalike 1%', 'Lookalike Audience', 30, 110000, 2800, 0.0255, 0.47, 1316, 45, 29.24, 3.1, 4080],\n    [month, 'Facebook', 'Sommer-Sale', 'AS002', 'Interesse Beauty', 'Interessen-Targeting', 25, 113000, 2500, 0.0221, 0.49, 1225, 45, 27.22, 2.9, 3553],\n    [month, 'Instagram', 'Neukunden', 'AS003', 'Frauen 25-34', 'Demografisch', 40, 156000, 4800, 0.0308, 0.38, 1824, 63, 28.95, 3.5, 6384],\n    [month, 'Google', 'Remarketing', 'AS004', 'Website-Besucher', 'Remarketing', 20, 45000, 980, 0.0218, 0.65, 637, 22, 28.95, 2.9, 1847],\n    [month, 'TikTok', 'Brand-Awareness', 'AS005', 'Ähnliche Zielgruppe', 'Lookalike', 35, 210000, 5400, 0.0257, 0.42, 2268, 41, 55.32, 1.9, 4309]\n  ];\n  \n  // Daten in die Tabelle einfügen\n  var nextCreativesRow = getNextEmptyRow(creativesSheet);\n  creativesSheet.getRange(nextCreativesRow, 1, creativesData.length, creativesData[0].length).setValues(creativesData);\n  \n  var nextAdSetsRow = getNextEmptyRow(adSetsSheet);\n  adSetsSheet.getRange(nextAdSetsRow, 1, adSetsData.length, adSetsData[0].length).setValues(adSetsData);\n}\n\n/**\n * Bestehende Daten für einen bestimmten Monat löschen\n */\nfunction clearExistingData(sheet, month) {\n  var lastRow = sheet.getLastRow();\n  if (lastRow <= 1) return; // Nur Header-Zeile\n  \n  var dataRange = sheet.getRange(2, 1, lastRow - 1, 1);\n  var values = dataRange.getValues();\n  \n  var rowsToDelete = [];\n  for (var i = 0; i < values.length; i++) {\n    if (values[i][0] === month) {\n      rowsToDelete.push(i + 2); // +2 wegen 0-basiertem Index und Header-Zeile\n    }\n  }\n  \n  // Zeilen von unten nach oben löschen, um Verschiebungsprobleme zu vermeiden\n  for (var j = rowsToDelete.length - 1; j >= 0; j--) {\n    sheet.deleteRow(rowsToDelete[j]);\n  }\n}\n\n/**\n * Findet die nächste leere Zeile in einem Tabellenblatt\n */\nfunction getNextEmptyRow(sheet) {\n  var values = sheet.getDataRange().getValues();\n  \n  for (var i = 0; i < values.length; i++) {\n    var row = values[i];\n    var isEmpty = true;\n    \n    for (var j = 0; j < row.length; j++) {\n      if (row[j] !== '') {\n        isEmpty = false;\n        break;\n      }\n    }\n    \n    if (isEmpty) {\n      return i + 1; // 1-basierter Index\n    }\n  }\n  \n  return values.length + 1; // Nach der letzten Zeile\n}\n\n// Aufruf der Hauptfunktion\nmain();"
+      },
+      "id": "b8a9cec8-1246-4c12-8a8d-9f60a88ea26f",
+      "name": "Google Apps Script",
+      "type": "n8n-nodes-base.googleAppsScript",
+      "typeVersion": 1,
+      "position": [
+        460,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "to": {
+          "value": "deniz@adsdrop.de"
+        },
+        "subject": "Razeco Dashboard: Monatliches Update abgeschlossen",
+        "text": "=Das monatliche Update des Razeco Performance Dashboards wurde abgeschlossen.\n\nZeitraum: {{ $json.month }}\n\nDas Dashboard ist verfügbar unter: https://docs.google.com/spreadsheets/d/19s3l4JgQz5U6jw3lgvO9LHlKGvDdzQPpEKMeteqnUqY/\n\nDiese E-Mail wurde automatisch vom n8n-Workflow generiert.",
+        "options": {}
+      },
+      "id": "dd8ce31d-d7a5-4fc5-82e5-f5d01f15df3b",
+      "name": "Email-Benachrichtigung",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        680,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger (am 1. jeden Monats)": {
+      "main": [
+        [
+          {
+            "node": "Google Apps Script",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Apps Script": {
+      "main": [
+        [
+          {
+            "node": "Email-Benachrichtigung",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

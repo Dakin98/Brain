@@ -1,0 +1,108 @@
+{
+  "briefing_id": "razeco_ug_2026-04-01",
+  "created_at": "2026-02-25T10:20:12.692096",
+  "status": "done",
+  "client": {
+    "name": "Razeco UG",
+    "website": "https://razeco.de",
+    "target_audience": "E-Commerce",
+    "language": "de"
+  },
+  "topic": {
+    "name": "April fools’ day. 24 flash sale",
+    "date": "2026-04-01",
+    "briefing_instructions": "April fool’s day fun sale strategy to boost sales.\nAll you have to do is send an email with a “95% OFF subject line”. You’ll receive a huge spike in opens.\nWhen a person opens an email they’ll see a gif where the “9” from “95” disappears and “1” appears, making it 15% OFF.\nIt’s a fun email to boost your sales & have a little fun with your subscribers.",
+    "example_images": [
+      {
+        "url": "https://prod-files-secure.s3.us-west-2.amazonaws.com/c4896eae-3ca0-425d-ac01-cb9894fecce9/3ad344f4-81ae-4ff0-b39e-1f9c0332e91d/Screenshot_2023-02-23_at_19.25.22.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB466WKL6VULV%2F20260225%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20260225T092008Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjED8aCXVzLXdlc3QtMiJHMEUCIQCL6vMlYtIpsQNX2mZZ6iI%2FLP0%2BYogzu6Glirv0Xy2bBgIgd6yxioBeXlAlgUtkONaLzRlxH6BB7LhgvQxcAP1Ec48q%2FwMICBAAGgw2Mzc0MjMxODM4MDUiDHBHogsW1LN44k6CICrcA%2FdfHWfFqHjD8b81vWPnbZnmapG3pMVrBMXRzGq95sQCpWunRGR%2Bdme5htr53fVKaFTTUab14xiFpSHM5BeE5zA7tbpOdOu7rarO%2BcZUQQ3DwKKXstA6Oakp97JLE0hNvg7e%2BIn1NchmbDQ0LtHFI377eRczPFgutU4h4gESrYOPN4NUkqkmX6RMXl6zRNnYXTU9M6BQG3SYlfM%2F3Asdn16nVGwbShjUD4zJggFl4pnnvsIA63Nmml0avvcu%2BobtH4g0%2FNH0cap65Pft2wSqyJO7a68Tcuc%2B9EDjg4mtr%2F9N2m6ARk%2FhOmdapXZCY170CiVMmbLrroCHWlo%2BzH4IDadqjIiYrrl438zNlqQ6EaEpaLrmGRydsjPneiEaOulaat8kE17x48hOOPiFGYJcCnLnmR7WU9vEqlJ4asVpD89vfNFR97Pl9am4y4KBl0%2BmoBvCcO2K9v3lC6RKstVNe0bdmjDX8cUivxxt7fQxpRwhXgu59E2tqgN9LzEwnEGMfXyqJ6OoyUsNOR6Dv13cY9Yje6MmmHwv4EcHk1lmkw1tgQR2dCTUHGoJhWc%2BSK4YaUAxUPxgf%2FgrFNxRW7s5rhUH8d3fNMnIqhx7MVlEssMjjrvJzELnpo3YvOTfMIe5%2BswGOqUBs8GC%2BifxQ1UC2sGKi3hwtX1xD49Rqk3T25Dn0N%2BwoLfolhvkomd5rh3VhtyfQWBVPMCUq%2BKd3ypnXMmTTJPKlrm%2FbB%2FrSy7hrkIhPPVdt9hdHkEHJ6PH90%2BPLOn1UFz9DrmzeEyH41O7CYgpUP0CjoPeE%2FGrhaThJbpzaaAuk5UNzQaCg8a88VwFjT6TVHgHjwjbUdDQRRXfyj43j2OLGbIuRZIP&X-Amz-Signature=264b3db016d1eaecdb547d30cc7de32b3ba32ff7515896ae7607f489f38afdae&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject",
+        "type": "example_email_design"
+      },
+      {
+        "url": "https://prod-files-secure.s3.us-west-2.amazonaws.com/c4896eae-3ca0-425d-ac01-cb9894fecce9/238aeab8-0b25-43f0-83e4-565398a9a96e/Screenshot_2023-02-23_at_19.25.56.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB466WKL6VULV%2F20260225%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20260225T092008Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjED8aCXVzLXdlc3QtMiJHMEUCIQCL6vMlYtIpsQNX2mZZ6iI%2FLP0%2BYogzu6Glirv0Xy2bBgIgd6yxioBeXlAlgUtkONaLzRlxH6BB7LhgvQxcAP1Ec48q%2FwMICBAAGgw2Mzc0MjMxODM4MDUiDHBHogsW1LN44k6CICrcA%2FdfHWfFqHjD8b81vWPnbZnmapG3pMVrBMXRzGq95sQCpWunRGR%2Bdme5htr53fVKaFTTUab14xiFpSHM5BeE5zA7tbpOdOu7rarO%2BcZUQQ3DwKKXstA6Oakp97JLE0hNvg7e%2BIn1NchmbDQ0LtHFI377eRczPFgutU4h4gESrYOPN4NUkqkmX6RMXl6zRNnYXTU9M6BQG3SYlfM%2F3Asdn16nVGwbShjUD4zJggFl4pnnvsIA63Nmml0avvcu%2BobtH4g0%2FNH0cap65Pft2wSqyJO7a68Tcuc%2B9EDjg4mtr%2F9N2m6ARk%2FhOmdapXZCY170CiVMmbLrroCHWlo%2BzH4IDadqjIiYrrl438zNlqQ6EaEpaLrmGRydsjPneiEaOulaat8kE17x48hOOPiFGYJcCnLnmR7WU9vEqlJ4asVpD89vfNFR97Pl9am4y4KBl0%2BmoBvCcO2K9v3lC6RKstVNe0bdmjDX8cUivxxt7fQxpRwhXgu59E2tqgN9LzEwnEGMfXyqJ6OoyUsNOR6Dv13cY9Yje6MmmHwv4EcHk1lmkw1tgQR2dCTUHGoJhWc%2BSK4YaUAxUPxgf%2FgrFNxRW7s5rhUH8d3fNMnIqhx7MVlEssMjjrvJzELnpo3YvOTfMIe5%2BswGOqUBs8GC%2BifxQ1UC2sGKi3hwtX1xD49Rqk3T25Dn0N%2BwoLfolhvkomd5rh3VhtyfQWBVPMCUq%2BKd3ypnXMmTTJPKlrm%2FbB%2FrSy7hrkIhPPVdt9hdHkEHJ6PH90%2BPLOn1UFz9DrmzeEyH41O7CYgpUP0CjoPeE%2FGrhaThJbpzaaAuk5UNzQaCg8a88VwFjT6TVHgHjwjbUdDQRRXfyj43j2OLGbIuRZIP&X-Amz-Signature=9dcca3c0bbc21df8d72d53298e5264faca33ee3e150ad3608c53f3cb4676e2a0&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject",
+        "type": "example_email_design"
+      }
+    ]
+  },
+  "brand": {
+    "colors": {
+      "hex_string": "#48413C, #696255, #0C5132, #F5F4F0, #ECEAE4, #C7C5BB, #BAB4A7",
+      "primary": "#48413C",
+      "secondary": "#696255",
+      "accent": "#0C5132"
+    },
+    "fonts": "DM Serif Display (headings), Plus Jakarta Sans (body), DM Sans (tagline)",
+    "tone": "Modern, eco-conscious, confident, slightly rebellious. Premium but accessible. German engineering meets Swiss design. Conversational but authoritative.",
+    "tagline": "shave the future.",
+    "logo_url": "https://d3k81ch9hvuctc.cloudfront.net/company/XjLDhQ/images/cf8d0958-9062-4a99-aea3-fe36c89695ae.png"
+  },
+  "products": {
+    "description": "",
+    "usps": "99% biobasiert\nTÜV Austria 4-Sterne zertifiziert (OK biobased)\nMade in Germany, Designed in Switzerland\nSchwedische Premium-Stahlklingen\nKeine Gelstreifen/Chemie (keine PEGs, Paraffine)\nErste Marke mit biobasierten Klingen weltweit\n99% weniger CO2 bei Entsorgung",
+    "top_products": "",
+    "social_proof": "12.000+ zufriedene Kunden\nTÜV Austria zertifiziert (4 Sterne)\nAs seen in: FAZ, Handelsblatt, Tagesspiegel\nLoved on TikTok",
+    "product_data": {
+      "system_razor_face": {
+        "title": "System Razor · Face",
+        "price": "24.99",
+        "currency": "EUR",
+        "url": "https://www.razeco.com/en-de/products/system-razor-face",
+        "img": "https://cdn.shopify.com/s/files/1/0892/0131/2077/files/face_razor_updated.png?v=1764876574",
+        "desc": "Biobasierte Klingen + Edelstahl-Griff. 1x Rasierer + 2 Klingenköpfe mit 5 Klingen & Backtrimmer."
+      },
+      "system_razor_body": {
+        "title": "System Razor · Body",
+        "price": "24.99",
+        "currency": "EUR",
+        "url": "https://www.razeco.com/en-de/products/system-razor-body",
+        "img": "https://cdn.shopify.com/s/files/1/0892/0131/2077/files/body_Razor_for_website_e079db2b-5f45-4c5b-bbf0-55b65257099c.png?v=1764877201",
+        "desc": "Biobasierte Klingen + Edelstahl-Griff. 1x Rasierer + 2 Klingenköpfe mit 5 Klingen & Backtrimmer."
+      },
+      "oneway_rose": {
+        "title": "Oneway Rosé",
+        "price_5pack": "3.99",
+        "price_20pack": "15.49",
+        "currency": "EUR",
+        "url": "https://www.razeco.com/en-de/products/oneway-rose",
+        "img": "https://cdn.shopify.com/s/files/1/0892/0131/2077/files/Razor_Single_Use2.png?v=1764877962",
+        "desc": "Plastikfreier Einwegrasierer. 3-10 Rasuren pro Stück."
+      },
+      "system_bundle": {
+        "title": "System Bundle",
+        "price": "37.96",
+        "currency": "EUR",
+        "url": "https://www.razeco.com/en-de/products/system-bundle",
+        "img": "https://cdn.shopify.com/s/files/1/0892/0131/2077/files/Frame1533211901.png?v=1764878250",
+        "desc": "5x Oneway + 1x Systemrasierer + 1x Refill-Pack. Spare 31%."
+      },
+      "refills_face": {
+        "title": "Face Refills",
+        "price_5pack": "22.49",
+        "price_10pack": "39.49",
+        "currency": "EUR",
+        "img": "https://cdn.shopify.com/s/files/1/0892/0131/2077/files/Razeco_Refills_face.png?v=1764877777",
+        "desc": "5x biobasierte Klingenköpfe mit je 5 Klingen."
+      },
+      "refills_body": {
+        "title": "Body Refills",
+        "price_5pack": "22.49",
+        "price_10pack": "39.49",
+        "currency": "EUR",
+        "img": "https://cdn.shopify.com/s/files/1/0892/0131/2077/files/Razeco_Refills_body_2e6f24f2-7177-4602-8b1e-815610f00042.png?v=1764877653",
+        "desc": "5x biobasierte Klingenköpfe mit je 5 Klingen."
+      }
+    }
+  },
+  "klaviyo": {
+    "api_key": "pk_dfc4dd8deb22827d0244a251f315db13c3",
+    "list_id": "ThKApp"
+  },
+  "output": {
+    "subject_line": "Neuigkeiten von Razeco UG ✨",
+    "preview_text": "Sieh dir an, was es Neues gibt",
+    "email_body_html": "<!DOCTYPE html>\n<html lang=\"de\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Neuigkeiten von Razeco UG ✨</title>\n  <!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->\n</head>\n<body style=\"margin:0;padding:0;background-color:#F5F5F5;\">\n  <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"100%\" style=\"backgro...",
+    "email_body_text": "Neuigkeiten von Razeco UG: Schau vorbei und entdecke, was wir für dich bereithalten.",
+    "klaviyo_template_id": "Yf3yAu",
+    "klaviyo_campaign_id": "01KJA1KRBJAP3EA6EBJ5WKQV8N",
+    "klaviyo_url": "https://www.klaviyo.com/campaign/01KJA1KRBJAP3EA6EBJ5WKQV8N/edit"
+  }
+}

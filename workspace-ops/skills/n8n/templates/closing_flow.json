@@ -1,0 +1,111 @@
+{
+  "description": "adsdrop Closing Flow - Creates deal in Airtable and sends DocuSeal contract",
+  "parameters": ["name", "customer_name", "airtable_record", "airtable_base"],
+  "workflow": {
+    "name": "{{name}} - Closing Flow",
+    "nodes": [
+      {
+        "parameters": {
+          "path": "closing-form-{{name}}",
+          "responseMode": "responseNode"
+        },
+        "name": "Closing Form Trigger",
+        "type": "n8n-nodes-base.formTrigger",
+        "typeVersion": 2.1,
+        "position": [250, 300]
+      },
+      {
+        "parameters": {
+          "operation": "create",
+          "base": {
+            "value": "{{airtable_base}}"
+          },
+          "table": "Kunden",
+          "fields": {
+            "mapping": [
+              {
+                "id": "Firma",
+                "value": "={{ $json.body.company }}"
+              },
+              {
+                "id": "Ansprechpartner",
+                "value": "={{ $json.body.contact_name }}"
+              },
+              {
+                "id": "Email",
+                "value": "={{ $json.body.email }}"
+              },
+              {
+                "id": "Status",
+                "value": "Vertrag ausstehend"
+              }
+            ]
+          }
+        },
+        "name": "Create Customer in Airtable",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 2,
+        "position": [450, 300]
+      },
+      {
+        "parameters": {
+          "operation": "send",
+          "templateId": 1,
+          "recipients": "={{ $json.fields.Email }}",
+          "subject": "Ihr adsdrop Agenturvertrag"
+        },
+        "name": "Send DocuSeal Contract",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.1,
+        "position": [650, 300]
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "name": "Respond to Webhook",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1,
+        "position": [850, 300]
+      }
+    ],
+    "connections": {
+      "Closing Form Trigger": {
+        "main": [
+          [
+            {
+              "node": "Create Customer in Airtable",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Customer in Airtable": {
+        "main": [
+          [
+            {
+              "node": "Send DocuSeal Contract",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send DocuSeal Contract": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1"
+    }
+  }
+}

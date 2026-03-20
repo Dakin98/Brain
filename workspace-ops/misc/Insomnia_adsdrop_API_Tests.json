@@ -1,0 +1,133 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-02-19T16:30:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2023.5.8",
+  "resources": [
+    {
+      "_id": "req_clickup_folder",
+      "parentId": "fld_clickup",
+      "_type": "request",
+      "name": "ClickUp: Folder erstellen",
+      "url": "https://api.clickup.com/api/v2/space/90040311585/folder",
+      "method": "POST",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "pk_63066979_9BJKQ4PHNOE3AEJWRH3PFKEH04MFZZY1"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Test Kunde Insomnia\"\n}"
+      }
+    },
+    {
+      "_id": "req_clickup_list",
+      "parentId": "fld_clickup",
+      "_type": "request",
+      "name": "ClickUp: Liste erstellen",
+      "url": "https://api.clickup.com/api/v2/folder/FOLDER_ID_HIER/list",
+      "method": "POST",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "pk_63066979_9BJKQ4PHNOE3AEJWRH3PFKEH04MFZZY1"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"📝 Creative Pipeline\"\n}"
+      }
+    },
+    {
+      "_id": "req_clickup_task",
+      "parentId": "fld_clickup",
+      "_type": "request",
+      "name": "ClickUp: Task erstellen",
+      "url": "https://api.clickup.com/api/v2/list/LIST_ID_HIER/task",
+      "method": "POST",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "pk_63066979_9BJKQ4PHNOE3AEJWRH3PFKEH04MFZZY1"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"🚀 Test Task\",\n  \"description\": \"Beschreibung hier\",\n  \"due_date\": 1708368000000,\n  \"assignees\": [63066979]\n}"
+      }
+    },
+    {
+      "_id": "req_airtable_get",
+      "parentId": "fld_airtable",
+      "_type": "request",
+      "name": "Airtable: Kunden holen (mit Filter)",
+      "url": "https://api.airtable.com/v0/appbGhxy9I18oIS8E/Kunden",
+      "method": "GET",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer DEIN_AIRTABLE_API_KEY"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "filterByFormula",
+          "value": "AND({Status}='Active', FIND('Paid Ads', {Services}))"
+        }
+      ]
+    },
+    {
+      "_id": "req_airtable_update",
+      "parentId": "fld_airtable",
+      "_type": "request",
+      "name": "Airtable: Folder ID updaten",
+      "url": "https://api.airtable.com/v0/appbGhxy9I18oIS8E/Kunden/RECORD_ID_HIER",
+      "method": "PATCH",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer DEIN_AIRTABLE_API_KEY"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"fields\": {\n    \"ClickUp Folder ID\": \"FOLDER_ID_HIER\"\n  }\n}"
+      }
+    },
+    {
+      "_id": "fld_clickup",
+      "parentId": "wrk_adsdrop",
+      "_type": "request_group",
+      "name": "ClickUp API"
+    },
+    {
+      "_id": "fld_airtable",
+      "parentId": "wrk_adsdrop",
+      "_type": "request_group",
+      "name": "Airtable API"
+    },
+    {
+      "_id": "wrk_adsdrop",
+      "_type": "workspace",
+      "name": "adsdrop API Tests"
+    }
+  ]
+}

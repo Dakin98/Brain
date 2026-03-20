@@ -1,0 +1,50 @@
+{
+  "briefing_id": "razeco_ug_2026-03-18",
+  "created_at": "2026-03-13T10:09:35.373528",
+  "status": "done",
+  "client": {
+    "name": "Razeco UG",
+    "website": "https://razeco.de",
+    "language": "de"
+  },
+  "topic": {
+    "name": "St. Patricks Day sale Last chance",
+    "date": "2026-03-18",
+    "briefing": "A \"St. Patrick's Day Sale Last Chance to Save\" email is a way for brands to remind customers that the sale is coming to an end and that this is their last chance to take advantage of the deals and discounts being offered. This type of email is designed to create a sense of urgency and encourage customers to act fast before the sale ends. Here are some ideas for what to include in a \"St. Patrick's Day Sale Last Chance to Save\" email:"
+  },
+  "copy": {
+    "subject": "🍀 Letzte 6h: Dein grünes Glück läuft ab",
+    "preview": "St. Patrick's Day Sale endet heute Mitternacht - spare jetzt €12",
+    "headline": "Dein grünes Glück verschwindet",
+    "body": [
+      "Um Mitternacht ist Schluss.",
+      "",
+      "Während alle anderen heute grün tragen, denkst du bereits an morgen. An eine Zukunft ohne Plastik-Müll im Bad. An Rasur, die nicht nur dich, sondern auch den Planeten respektiert.",
+      "",
+      "Nur noch 6 Stunden, dann verschwindet unser St. Patrick's Day Deal:",
+      "",
+      "✓ System Bundle: €37.96 statt €49.98 (spare €12)",
+      "✓ 99% biobasiert — erste Klingen weltweit",
+      "✓ Made in Germany, TÜV Austria zertifiziert",
+      "✓ 99% weniger CO2 bei der Entsorgung",
+      "",
+      "12.000+ Kunden haben bereits gewechselt. Heute ist deine letzte Chance, Teil der Revolution zu werden — bevor der Preis wieder steigt.",
+      "",
+      "Keine Gelstreifen. Keine Chemie. Nur pure Performance.",
+      "",
+      "Der Timer läuft. Das Glück wartet nicht."
+    ],
+    "cta": "Jetzt zugreifen →",
+    "closing": "shave the future.<br>Team Razeco",
+    "products_to_show": [
+      "system_bundle",
+      "system_razor_face"
+    ]
+  },
+  "klaviyo": {
+    "success": true,
+    "template_id": "WbWcwi",
+    "campaign_id": "01KKK7AP48DDA2Y7AQ2J3GYSWH",
+    "url": "https://www.klaviyo.com/campaign/01KKK7AP48DDA2Y7AQ2J3GYSWH/edit"
+  }
+}

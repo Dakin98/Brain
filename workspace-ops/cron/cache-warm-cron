@@ -1,0 +1,20 @@
+# Cron Job für Cache Warming (SQLite-basiert)
+# Speichere als: ~/.openclaw/workspace/cron/cache-warm-cron
+# Installieren mit: crontab ~/.openclaw/workspace/cron/cache-warm-cron
+
+CACHE_PY="$HOME/.openclaw/workspace/skills/process-optimizer/agent_cache.py"
+
+# Täglich um 6:00 Uhr: Cache warming für wichtige Daten
+0 6 * * * cd ~/.openclaw/workspace && python3 skills/process-optimizer/agent_cache.py init && python3 skills/process-optimizer/agent_cache.py clear-expired >> ~/.openclaw/workspace/logs/cache-warm.log 2>&1
+
+# Stündlich: Meta Ads Daten refreshen (während Geschäftszeiten)
+0 8-20 * * 1-5 cd ~/.openclaw/workspace && bash skills/process-optimizer/examples/cached-meta-ads.sh >> ~/.openclaw/workspace/logs/meta-ads.log 2>&1
+
+# Täglich um 7:00 Uhr: Shopify Revenue aktualisieren
+0 7 * * * cd ~/.openclaw/workspace && bash skills/process-optimizer/examples/cached-shopify.sh >> ~/.openclaw/workspace/logs/shopify.log 2>&1
+
+# Wöchentlich (Sonntag 5:00): Klaviyo Segmente
+0 5 * * 0 cd ~/.openclaw/workspace && python3 skills/process-optimizer/agent_cache.py fetch "klaviyo_segments" 168 "echo '[]'" >> ~/.openclaw/workspace/logs/klaviyo.log 2>&1
+
+# Token-Usage Tracking (täglich 23:00)
+0 23 * * * cd ~/.openclaw/workspace && python3 skills/process-optimizer/agent_cache.py stats >> ~/.openclaw/workspace/logs/token-usage.log 2>&1

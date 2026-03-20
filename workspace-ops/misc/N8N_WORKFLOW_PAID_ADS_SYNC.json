@@ -1,0 +1,211 @@
+{
+  "name": "Airtable → ClickUp: Paid Ads Onboarding",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "minutes", "minutesInterval": 5 }]
+        }
+      },
+      "id": "trigger",
+      "name": "Every 5 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "operation": "list",
+        "application": "appbGhxy9I18oIS8E",
+        "table": "tbluuOSL8CTyIo0Ng",
+        "options": {
+          "filterByFormula": "AND({Status}='Active', FIND('Paid Ads', {Services}) > 0, {ClickUp Folder ID} = '')"
+        }
+      },
+      "id": "airtable_get",
+      "name": "Get Active Paid Ads Clients",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [220, 0],
+      "credentials": { "airtableTokenApi": { "id": "AIRTABLE_CREDENTIAL_ID", "name": "Airtable Token" } }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "" },
+          "conditions": [
+            {
+              "id": "has-records",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "isNotEmpty" }
+            }
+          ]
+        }
+      },
+      "id": "if_has_records",
+      "name": "Has Records?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [440, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.clickup.com/api/v2/space/90040311585/folder",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ name: $json.fields.Firmenname + ' - Paid Ads' }) }}"
+      },
+      "id": "create_folder",
+      "name": "Create ClickUp Folder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 0],
+      "credentials": { "httpHeaderAuth": { "id": "CLICKUP_HEADER_AUTH_ID", "name": "ClickUp Token" } },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.clickup.com/api/v2/folder/{{ $json.id }}/list",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ name: 'Creative Pipeline' }) }}"
+      },
+      "id": "create_list",
+      "name": "Create Creative Pipeline List",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 0],
+      "credentials": { "httpHeaderAuth": { "id": "CLICKUP_HEADER_AUTH_ID", "name": "ClickUp Token" } },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "application": "appbGhxy9I18oIS8E",
+        "table": "tbluuOSL8CTyIo0Ng",
+        "id": "={{ $('Get Active Paid Ads Clients').item.json.id }}",
+        "fields": {
+          "values": [
+            {
+              "fieldName": "ClickUp Folder ID",
+              "fieldValue": "={{ $('Create ClickUp Folder').item.json.id }}"
+            }
+          ]
+        }
+      },
+      "id": "update_airtable",
+      "name": "Save Folder ID to Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [1100, 0],
+      "credentials": { "airtableTokenApi": { "id": "AIRTABLE_CREDENTIAL_ID", "name": "Airtable Token" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "const kundenName = $('Get Active Paid Ads Clients').item.json.fields.Firmenname;\nconst listId = $('Create Creative Pipeline List').item.json.id;\nconst now = Date.now();\nconst DAY = 86400000;\n\nconst tasks = [\n  { name: '🚀 Kickoff Call', offset: 0 },\n  { name: '🔍 Tracking Audit', offset: 1 },\n  { name: '📊 Account Analysis', offset: 2 },\n  { name: '📝 Creative Briefing', offset: 3 },\n  { name: '🎨 Creative Produktion', offset: 5 },\n  { name: '👀 Kunden Review', offset: 8 },\n  { name: '🚀 Campaign Launch', offset: 10 },\n  { name: '📈 Performance Check Tag 3', offset: 13 },\n  { name: '📈 Performance Check Tag 7', offset: 17 }\n];\n\nreturn tasks.map(t => ({\n  json: {\n    listId,\n    kundenName,\n    taskName: t.name,\n    dueDate: now + (t.offset * DAY)\n  }\n}));"
+      },
+      "id": "prepare_tasks",
+      "name": "Prepare Task List",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1320, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.clickup.com/api/v2/list/{{ $json.listId }}/task",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ name: $json.kundenName + ' - ' + $json.taskName, due_date: $json.dueDate, due_date_time: false, status: 'to do' }) }}"
+      },
+      "id": "create_tasks",
+      "name": "Create ClickUp Tasks",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1540, 0],
+      "credentials": { "httpHeaderAuth": { "id": "CLICKUP_HEADER_AUTH_ID", "name": "ClickUp Token" } },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst kundenName = items[0].json.kundenName || 'Unbekannt';\nconst created = items.filter(i => !i.json.error).length;\nconst failed = items.filter(i => i.json.error).length;\nreturn [{ json: { kundenName, created, failed, message: `Neuer Paid Ads Kunde: ${kundenName} - ${created} Tasks erstellt` + (failed > 0 ? ` (${failed} fehlgeschlagen)` : '') } }];"
+      },
+      "id": "summarize",
+      "name": "Summarize Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1760, 0]
+    },
+    {
+      "parameters": {
+        "chatId": "DENIZ_TELEGRAM_CHAT_ID",
+        "text": "={{ $json.message }}",
+        "additionalFields": {}
+      },
+      "id": "telegram_notify",
+      "name": "Telegram Notification",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1980, 0],
+      "credentials": { "telegramApi": { "id": "TELEGRAM_CREDENTIAL_ID", "name": "Telegram Bot" } }
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [{ "name": "error", "value": "=Folder creation failed: {{ $json.error || $json.statusMessage }}" }]
+        }
+      },
+      "id": "error_handler",
+      "name": "Log Error",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [880, 200]
+    },
+    {
+      "parameters": {
+        "chatId": "DENIZ_TELEGRAM_CHAT_ID",
+        "text": "=⚠️ Paid Ads Onboarding FEHLER: {{ $json.error }}",
+        "additionalFields": {}
+      },
+      "id": "telegram_error",
+      "name": "Telegram Error Alert",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1100, 200],
+      "credentials": { "telegramApi": { "id": "TELEGRAM_CREDENTIAL_ID", "name": "Telegram Bot" } }
+    }
+  ],
+  "connections": {
+    "Every 5 Minutes": { "main": [[{ "node": "Get Active Paid Ads Clients", "type": "main", "index": 0 }]] },
+    "Get Active Paid Ads Clients": { "main": [[{ "node": "Has Records?", "type": "main", "index": 0 }]] },
+    "Has Records?": { "main": [[{ "node": "Create ClickUp Folder", "type": "main", "index": 0 }], []] },
+    "Create ClickUp Folder": {
+      "main": [
+        [{ "node": "Create Creative Pipeline List", "type": "main", "index": 0 }],
+        [{ "node": "Log Error", "type": "main", "index": 0 }]
+      ]
+    },
+    "Create Creative Pipeline List": { "main": [[{ "node": "Save Folder ID to Airtable", "type": "main", "index": 0 }]] },
+    "Save Folder ID to Airtable": { "main": [[{ "node": "Prepare Task List", "type": "main", "index": 0 }]] },
+    "Prepare Task List": { "main": [[{ "node": "Create ClickUp Tasks", "type": "main", "index": 0 }]] },
+    "Create ClickUp Tasks": { "main": [[{ "node": "Summarize Results", "type": "main", "index": 0 }]] },
+    "Summarize Results": { "main": [[{ "node": "Telegram Notification", "type": "main", "index": 0 }]] },
+    "Log Error": { "main": [[{ "node": "Telegram Error Alert", "type": "main", "index": 0 }]] }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "tags": [{ "name": "Paid Ads" }, { "name": "Onboarding" }, { "name": "Airtable-ClickUp" }]
+}

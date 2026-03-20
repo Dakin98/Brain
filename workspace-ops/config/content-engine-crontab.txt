@@ -1,0 +1,11 @@
+# Content Engine Cron Jobs
+# Add these to your crontab with: crontab -e
+
+# Content Engine: Check for "Claude Generate" status every 5 minutes
+*/5 * * * * cd /Users/denizakin/.openclaw/workspace && python3 scripts/content_engine_check_status.py >> /tmp/content_engine_cron.log 2>&1
+
+# YouTube Pipeline: Check for "Recording Prep" status and create Drive folders
+*/5 * * * * cd /Users/denizakin/.openclaw/workspace && python3 scripts/youtube_pipeline_monitor.py >> /tmp/youtube_pipeline_cron.log 2>&1
+
+# Optional: Daily report on content engine activity
+0 9 * * 1 echo "Content Engine Weekly Check" >> /tmp/content_engine_report.log 2>&1

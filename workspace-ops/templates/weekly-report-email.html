@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly Performance Report</title>
+<style>
+  body { margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, sans-serif; background: #f4f4f7; color: #333; }
+  .container { max-width: 640px; margin: 0 auto; background: #fff; }
+  .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 32px 40px; text-align: center; }
+  .header img { max-width: 140px; margin-bottom: 8px; }
+  .header h1 { color: #fff; font-size: 22px; margin: 0; font-weight: 600; }
+  .header .subtitle { color: #a0aec0; font-size: 14px; margin-top: 6px; }
+  .section { padding: 28px 40px; }
+  .section-title { font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #1a1a2e; margin-bottom: 16px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+  .kpi-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+  .kpi-card { flex: 1; min-width: 120px; background: #f7fafc; border-radius: 8px; padding: 16px; text-align: center; }
+  .kpi-value { font-size: 24px; font-weight: 700; color: #1a1a2e; }
+  .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #718096; margin-top: 4px; }
+  .kpi-change { font-size: 12px; margin-top: 4px; }
+  .kpi-change.up { color: #38a169; }
+  .kpi-change.down { color: #e53e3e; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 10px 12px; background: #f7fafc; color: #718096; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  td { padding: 10px 12px; border-bottom: 1px solid #edf2f7; }
+  .status-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  .status-winner { background: #c6f6d5; color: #22543d; }
+  .status-testing { background: #fefcbf; color: #744210; }
+  .status-loser { background: #fed7d7; color: #742a2a; }
+  .cta-button { display: inline-block; background: #1a1a2e; color: #fff !important; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 14px; margin-top: 16px; }
+  .footer { background: #f7fafc; padding: 24px 40px; text-align: center; font-size: 12px; color: #a0aec0; }
+  .divider { height: 1px; background: #e2e8f0; margin: 0; }
+  .next-steps li { margin-bottom: 8px; line-height: 1.5; }
+  @media (max-width: 480px) {
+    .section { padding: 20px 20px; }
+    .header { padding: 24px 20px; }
+    .kpi-card { min-width: 100px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <h1>Weekly Performance Report</h1>
+    <div class="subtitle">{{client_name}} · KW{{calendar_week}} · {{date_range}}</div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="section">
+    <div class="section-title">📊 Performance Overview</div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-value">€{{total_spend}}</div>
+        <div class="kpi-label">Ad Spend</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">{{roas}}x</div>
+        <div class="kpi-label">ROAS</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">{{total_purchases}}</div>
+        <div class="kpi-label">Conversions</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">{{ctr}}%</div>
+        <div class="kpi-label">CTR</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">€{{cpc}}</div>
+        <div class="kpi-label">CPC</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">€{{cost_per_purchase}}</div>
+        <div class="kpi-label">Cost/Conv.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Campaign Performance -->
+  <div class="section">
+    <div class="section-title">🎯 Campaign Performance</div>
+    <table>
+      <thead>
+        <tr><th>Campaign</th><th>Spend</th><th>ROAS</th><th>CTR</th><th>Conv.</th></tr>
+      </thead>
+      <tbody>
+        {{#campaigns}}
+        <tr>
+          <td><strong>{{name}}</strong></td>
+          <td>€{{spend}}</td>
+          <td>{{roas}}x</td>
+          <td>{{ctr}}%</td>
+          <td>{{purchases}}</td>
+        </tr>
+        {{/campaigns}}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Creative Overview -->
+  <div class="section">
+    <div class="section-title">🎨 Creative Overview</div>
+    <table>
+      <thead>
+        <tr><th>Creative</th><th>Spend</th><th>CTR</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        {{#creatives}}
+        <tr>
+          <td>{{name}}</td>
+          <td>€{{spend}}</td>
+          <td>{{ctr}}%</td>
+          <td><span class="status-badge status-{{status_class}}">{{status}}</span></td>
+        </tr>
+        {{/creatives}}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Budget Status -->
+  <div class="section">
+    <div class="section-title">💰 Budget Status</div>
+    <p>
+      <strong>Wochenbudget:</strong> €{{weekly_budget}}<br>
+      <strong>Ausgegeben:</strong> €{{total_spend}} ({{budget_pct}}%)<br>
+      <strong>Verbleibend:</strong> €{{budget_remaining}}
+    </p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Next Steps -->
+  <div class="section">
+    <div class="section-title">📋 Next Steps</div>
+    <ul class="next-steps">
+      {{#next_steps}}
+      <li>{{.}}</li>
+      {{/next_steps}}
+    </ul>
+  </div>
+
+  <!-- CTA -->
+  <div class="section" style="text-align: center;">
+    <a href="{{sheet_link}}" class="cta-button">📄 Zum vollständigen Report</a>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>Dieser Report wurde automatisch erstellt von <strong>adsdrop</strong>.</p>
+    <p>Bei Fragen: {{sender_email}}</p>
+  </div>
+</div>
+</body>
+</html>

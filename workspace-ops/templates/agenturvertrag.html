@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 11pt; line-height: 1.6; color: #1a1a1a; max-width: 700px; margin: 40px auto; padding: 0 20px; }
+  h1 { text-align: center; font-size: 18pt; margin-bottom: 40px; letter-spacing: 2px; }
+  h2 { font-size: 12pt; margin-top: 30px; }
+  .parties { margin-bottom: 30px; }
+  .party { margin-bottom: 20px; }
+  .party-label { font-weight: bold; font-size: 10pt; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+  table.staffel { border-collapse: collapse; width: 100%; margin: 15px 0; }
+  table.staffel th, table.staffel td { border: 1px solid #ccc; padding: 8px 12px; text-align: left; }
+  table.staffel th { background: #f5f5f5; }
+  .beispiel { background: #f9f9f9; padding: 15px; border-left: 3px solid #333; margin: 15px 0; }
+  .signature-block { margin-top: 60px; display: flex; justify-content: space-between; }
+  .sig-party { width: 45%; }
+  .sig-line { border-top: 1px solid #333; margin-top: 60px; padding-top: 5px; font-size: 10pt; }
+  ul { margin: 10px 0; }
+  li { margin-bottom: 5px; }
+</style>
+</head>
+<body>
+
+<h1>AGENTURVERTRAG</h1>
+
+<div class="parties">
+  <div class="party">
+    <div class="party-label">zwischen</div>
+    <strong>{{firmenname}}</strong><br>
+    {{adresse}}<br>
+    (im Folgenden „Auftraggeber" genannt)
+  </div>
+  
+  <div class="party">
+    <div class="party-label">und</div>
+    <strong>Adsdrop</strong><br>
+    Ansprechpartner: Deniz Akin<br>
+    Lüdenscheider Weg 5B<br>
+    13599 Berlin<br>
+    (im Folgenden „Agentur" genannt)
+  </div>
+</div>
+
+<h2>§ 1 Vertragsgegenstand</h2>
+<p>(1) Die Agentur übernimmt für den Auftraggeber die vollumfängliche Betreuung, Optimierung und Skalierung der Performance-Marketing-Maßnahmen des Online-Shops des Auftraggebers.</p>
+<p>(2) Der Leistungsumfang umfasst insbesondere:</p>
+<ul>
+  <li><strong>Meta (Facebook / Instagram Ads):</strong> Kampagnenaufbau, Zielgruppenanalyse, Creative-Testing, Funnel-Strategien, Einrichtung und Pflege von Tracking-Systemen (Meta Pixel, Conversion API, Event-Mapping), kontinuierliche Optimierung anhand von KPIs (ROAS, CPA, CTR, CPM, Conversion Rate), Aufbau datenbasierter Skalierungsstrategien.</li>
+  <li><strong>Google Ads (Search / Shopping / Display / YouTube):</strong> Kampagnenstrukturierung, Keyword- und Feed-Optimierung, Erstellung von Anzeigentexten, Conversion-Tracking, A/B-Testing, Gebotsstrategien, Performance-Auswertung.</li>
+  <li><strong>Strategische Skalierung &amp; Beratung:</strong> Ganzheitliche Funnel- und Wachstumsstrategie, Aufbau und Betreuung von Remarketing-Flows, monatliche Strategiereviews und Performance-Analysen.</li>
+</ul>
+<p>(3) Die Agentur erbringt ihre Leistungen selbstständig und eigenverantwortlich. Ein Arbeitsverhältnis wird durch diesen Vertrag nicht begründet.</p>
+
+<h2>§ 2 Vergütung</h2>
+<p>(1) Für die Zusammenarbeit wird folgende Vergütungsstruktur vereinbart:</p>
+<ul>
+  <li>Ein monatliches Fixum in Höhe von <strong>{{fixum}} € netto</strong>, solange der aus dem vereinbarten Revenue Share (Abs. 2) resultierende Betrag unter {{fixum}} € liegt.</li>
+  <li>Sobald der Revenue Share diesen Betrag übersteigt, entfällt das Fixum vollständig.</li>
+</ul>
+
+<p>(2) Die Agentur erhält zusätzlich eine variable Umsatzbeteiligung (Revenue Share) auf Basis des durch ihre Maßnahmen erzielten monatlichen Netto-Umsatzes (exkl. Steuern, Versandkosten und Rücksendungen). Die Beteiligung erfolgt gestaffelt und wird kumulativ nach Umsatzstufen (progressiv fallend) berechnet:</p>
+
+<table class="staffel">
+  <tr><th>Monatlicher Netto-Umsatz</th><th>Beteiligung der Agentur</th></tr>
+  <tr><td>bis 50.000 €</td><td>{{rs_1}} %</td></tr>
+  <tr><td>50.001 € – 100.000 €</td><td>{{rs_2}} %</td></tr>
+  <tr><td>100.001 € – 250.000 €</td><td>{{rs_3}} %</td></tr>
+  <tr><td>250.001 € – 500.000 €</td><td>{{rs_4}} %</td></tr>
+  <tr><td>500.001 € – 1.000.000 €</td><td>{{rs_5}} %</td></tr>
+  <tr><td>über 1.000.000 €</td><td>{{rs_6}} %</td></tr>
+</table>
+
+<p>(3) Zu Beginn der Zusammenarbeit wird eine einmalige Setup-Gebühr in Höhe von <strong>{{setup_gebuehr}} € netto</strong> fällig. Diese beinhaltet das vollständige technische Setup (Tracking, Domain, E-Mail-Flows, Shop-Integration, Conversion API etc.).</p>
+
+<p>(4) Das Fixum ist jeweils zum ersten Werktag des Monats im Voraus zu zahlen. Der Revenue Share wird monatlich rückwirkend auf Basis der Umsätze des Vormonats abgerechnet.</p>
+
+<p>(5) Alle genannten Beträge verstehen sich zuzüglich der gesetzlichen Mehrwertsteuer.</p>
+
+<p><em>(Hinweis: Der „effektive Anteil" bezeichnet den durchschnittlichen Prozentsatz der Agenturvergütung bezogen auf den gesamten Monatsumsatz. Dieser sinkt mit steigendem Umsatz aufgrund der progressiv fallenden Staffelung.)</em></p>
+
+<h2>§ 3 Vertragsdauer und Kündigung</h2>
+<p>(1) Der Vertrag beginnt am <strong>{{vertragsbeginn}}</strong> und hat eine Mindestlaufzeit von drei (3) Monaten.</p>
+<p>(2) Im ersten Monat kann der Vertrag jederzeit ohne Frist von beiden Parteien gekündigt werden.</p>
+<p>(3) Nach Ablauf der drei Monate verlängert sich der Vertrag automatisch auf unbestimmte Zeit und kann mit einer Frist von vier Wochen zum Monatsende gekündigt werden.</p>
+<p>(4) Das Recht zur außerordentlichen Kündigung aus wichtigem Grund bleibt unberührt.</p>
+
+<h2>§ 4 Zusammenarbeit und Reporting</h2>
+<p>(1) Die Agentur verpflichtet sich, den Auftraggeber regelmäßig über den Fortschritt und die Ergebnisse der Maßnahmen zu informieren.</p>
+<p>(2) Monatliche Reports müssen mindestens folgende Inhalte enthalten:</p>
+<ul>
+  <li>Übersicht über Werbeausgaben, Umsätze und Performance-Kennzahlen</li>
+  <li>Darstellung aller durchgeführten Optimierungen</li>
+  <li>Klare Handlungsempfehlungen für die Folgemonate</li>
+</ul>
+<p>(3) Der Auftraggeber stellt der Agentur alle notwendigen Zugänge und Informationen rechtzeitig zur Verfügung.</p>
+
+<h2>§ 5 Rechte und Pflichten</h2>
+<p>(1) Sämtliche im Rahmen dieses Vertrags erstellten Werbematerialien, Kampagnendaten und technischen Setups bleiben bis zur vollständigen Bezahlung aller Rechnungen Eigentum der Agentur.</p>
+<p>(2) Nach vollständiger Bezahlung gehen alle Rechte am erstellten Material auf den Auftraggeber über.</p>
+<p>(3) Beide Parteien verpflichten sich zur vertraulichen Behandlung sämtlicher geschäftlicher Informationen.</p>
+
+<h2>§ 6 Haftung</h2>
+<p>(1) Die Agentur haftet nur für Schäden, die auf Vorsatz oder grober Fahrlässigkeit beruhen.</p>
+<p>(2) Eine Haftung für entgangenen Gewinn, mittelbare Schäden oder Folgeschäden ist ausgeschlossen.</p>
+<p>(3) Eine Erfolgsgarantie hinsichtlich bestimmter Umsätze oder Gewinne wird ausdrücklich nicht übernommen.</p>
+
+<h2>§ 7 Schlussbestimmungen</h2>
+<p>(1) Änderungen und Ergänzungen dieses Vertrags bedürfen der Schriftform.</p>
+<p>(2) Sollte eine Bestimmung dieses Vertrags unwirksam sein oder werden, bleibt die Wirksamkeit der übrigen Bestimmungen unberührt.</p>
+<p>(3) Gerichtsstand ist – soweit gesetzlich zulässig – Berlin.</p>
+<p>(4) Es gilt das Recht der Bundesrepublik Deutschland.</p>
+
+<div class="signature-block">
+  <div class="sig-party">
+    <div class="sig-line">Ort, Datum / Unterschrift Auftraggeber<br><strong>{{firmenname}}</strong></div>
+  </div>
+  <div class="sig-party">
+    <div class="sig-line">Ort, Datum / Unterschrift Agentur<br><strong>Adsdrop – Deniz Akin</strong></div>
+  </div>
+</div>
+
+</body>
+</html>

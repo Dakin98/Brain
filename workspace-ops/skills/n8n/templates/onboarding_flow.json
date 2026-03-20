@@ -1,0 +1,130 @@
+{
+  "description": "adsdrop Onboarding Flow - Processes onboarding form, creates Drive folder, sends confirmation",
+  "parameters": ["name", "customer_name", "airtable_record", "airtable_base"],
+  "workflow": {
+    "name": "{{name}} - Onboarding Flow",
+    "nodes": [
+      {
+        "parameters": {
+          "path": "onboarding-form-{{name}}",
+          "responseMode": "responseNode"
+        },
+        "name": "Onboarding Form Trigger",
+        "type": "n8n-nodes-base.formTrigger",
+        "typeVersion": 2.1,
+        "position": [250, 300]
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "base": {
+            "value": "{{airtable_base}}"
+          },
+          "table": "Kunden",
+          "id": "={{ $json.body.airtable_record_id }}",
+          "fields": {
+            "mapping": [
+              {
+                "id": "Status",
+                "value": "Active"
+              },
+              {
+                "id": "Onboarding Form Completed",
+                "value": true
+              }
+            ]
+          }
+        },
+        "name": "Update Customer Status",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 2,
+        "position": [450, 300]
+      },
+      {
+        "parameters": {
+          "resource": "drive",
+          "operation": "create",
+          "name": "={{ $json.fields.Firma }}",
+          "parentId": "1_8oRxRfP1PHXEsGhdsfsGPLOjCopxMee"
+        },
+        "name": "Create Client Drive Folder",
+        "type": "n8n-nodes-base.googleDrive",
+        "typeVersion": 3,
+        "position": [650, 300]
+      },
+      {
+        "parameters": {
+          "sendOptions": {
+            "sendBatch": true
+          },
+          "toRecipients": "={{ $json.fields.Email }}",
+          "subject": "Willkommen bei adsdrop - Ihr Onboarding ist abgeschlossen",
+          "emailType": "html",
+          "body": "<h1>Willkommen bei adsdrop!</h1><p>Ihr Onboarding ist abgeschlossen. Wir starten jetzt mit dem Setup.</p>"
+        },
+        "name": "Send Confirmation Email",
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2,
+        "position": [850, 300]
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "name": "Respond to Webhook",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1,
+        "position": [1050, 300]
+      }
+    ],
+    "connections": {
+      "Onboarding Form Trigger": {
+        "main": [
+          [
+            {
+              "node": "Update Customer Status",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update Customer Status": {
+        "main": [
+          [
+            {
+              "node": "Create Client Drive Folder",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Client Drive Folder": {
+        "main": [
+          [
+            {
+              "node": "Send Confirmation Email",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send Confirmation Email": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1"
+    }
+  }
+}

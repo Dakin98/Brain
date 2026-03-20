@@ -1,0 +1,826 @@
+{
+  "name": "Weekly Newsletter Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weekday",
+              "mode": "every",
+              "triggerAtHour": 9,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "databaseId": "3465a32b-5659-4fd8-97c2-63984dbd89d9",
+        "returnAll": true,
+        "options": {}
+      },
+      "name": "Get Notion Topics",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [420, 200],
+      "credentials": {
+        "notionApi": {
+          "id": "notion-api",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "value": "appbGhxy9I18oIS8E",
+          "mode": "id"
+        },
+        "table": {
+          "value": "Kunden",
+          "mode": "id"
+        },
+        "options": {
+          "filterByFormula": "AND(OR(Status='Aktiv',Status='Onboarding'),{Klaviyo API Key}!='')"
+        }
+      },
+      "name": "Get Airtable Clients",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [420, 600],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "airtable-api",
+          "name": "Airtable API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter topics for next 14 days
+const today = new Date();
+const dateStart = new Date(today);
+const dateEnd = new Date(today);
+dateEnd.setDate(dateEnd.getDate() + 14);
+
+const allEntries = $input.all();
+const weekEntries = [];
+
+for (const entry of allEntries) {
+  const props = entry.json.properties;
+  const dateProp = props?.Date?.date;
+  
+  if (!dateProp || !dateProp.start) continue;
+  
+  const entryDate = new Date(dateProp.start);
+  const mappedDate = new Date(today.getFullYear(), entryDate.getMonth(), entryDate.getDate());
+  
+  if (mappedDate >= dateStart && mappedDate <= dateEnd) {
+    const name = props?.Name?.title?.map(t => t.plain_text).join('') || '';
+    const types = props?.['Email Type']?.multi_select?.map(s => s.name) || [];
+    
+    weekEntries.push({
+      name: name,
+      date: mappedDate.toISOString().split('T')[0],
+      types: types,
+      pageId: entry.json.id
+    });
+  }
+}
+
+weekEntries.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+return weekEntries.map(entry => ({
+  json: entry
+}));"
+      },
+      "name": "Filter Topics",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [620, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "const topic = $input.first().json;
+
+// Fetch page content from Notion
+try {
+  const response = await $httpRequest({
+    method: 'GET',
+    url: `https://api.notion.com/v1/blocks/${topic.pageId}/children`,
+    headers: {
+      'Authorization': 'Bearer YOUR_NOTION_TOKEN_HERE',
+      'Notion-Version': '2025-09-03'
+    }
+  });
+  
+  const blocks = response.body?.results || [];
+  const contentLines = [];
+  
+  for (const block of blocks) {
+    const type = block.type;
+    if (type === 'paragraph') {
+      const text = block.paragraph?.rich_text?.map(t => t.plain_text).join('') || '';
+      if (text.trim()) contentLines.push(text);
+    } else if (type === 'bulleted_list_item') {
+      const text = block.bulleted_list_item?.rich_text?.map(t => t.plain_text).join('') || '';
+      if (text.trim()) contentLines.push(`• ${text}`);
+    } else if (type === 'numbered_list_item') {
+      const text = block.numbered_list_item?.rich_text?.map(t => t.plain_text).join('') || '';
+      if (text.trim()) contentLines.push(`${text}`);
+    } else if (type === 'heading_1' || type === 'heading_2' || type === 'heading_3') {
+      const text = block[type]?.rich_text?.map(t => t.plain_text).join('') || '';
+      if (text.trim()) contentLines.push(`<strong>${text}</strong>`);
+    } else if (type === 'quote') {
+      const text = block.quote?.rich_text?.map(t => t.plain_text).join('') || '';
+      if (text.trim()) contentLines.push(`<em>"${text}"</em>`);
+    }
+  }
+  
+  return [{
+    json: {
+      ...topic,
+      content: contentLines.join('\n'),
+      contentLines: contentLines
+    }
+  }];
+} catch (error) {
+  return [{
+    json: {
+      ...topic,
+      content: '',
+      contentError: error.message
+    }
+  }];
+}"
+      },
+      "name": "Get Topic Content",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [820, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "const records = $input.all();
+
+const clients = records.map(record => ({
+  id: record.json.id,
+  firmenname: record.json.fields?.Firmenname || '',
+  klaviyoKey: record.json.fields?.['Klaviyo API Key'] || '',
+  website: record.json.fields?.Website || '',
+  branche: record.json.fields?.Branche || '',
+  tonalitaet: record.json.fields?.Tonalität || '',
+  emailFrom: record.json.fields?.['E-Mail Rechnungen'] || 'hello@adsdrop.de'
+})).filter(c => c.klaviyoKey);
+
+return clients.map(client => ({
+  json: { type: 'client', data: client }
+}));"
+      },
+      "name": "Parse Clients",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [620, 600]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Mark topics with type
+const topics = $input.all().map(item => ({
+  json: { type: 'topic', data: item.json }
+}));
+
+return topics;"
+      },
+      "name": "Mark Topics",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1020, 200]
+    },
+    {
+      "parameters": {
+        "mergeBy": ["always"],
+        "options": {}
+      },
+      "name": "Merge Data",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [1220, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();
+
+// Separate topics and clients
+const topics = items
+  .filter(i => i.json.type === 'topic')
+  .map(i => i.json.data);
+
+const clients = items
+  .filter(i => i.json.type === 'client')
+  .map(i => i.json.data);
+
+if (topics.length === 0 || clients.length === 0) {
+  throw new Error(`Missing data: ${topics.length} topics, ${clients.length} clients`);
+}
+
+// Create all combinations
+const combinations = [];
+for (const client of clients) {
+  for (const topic of topics) {
+    combinations.push({
+      json: {
+        topic: topic,
+        client: client
+      }
+    });
+  }
+}
+
+return combinations;"
+      },
+      "name": "Create Combos",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1420, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;
+const client = item.client;
+const topic = item.topic;
+
+if (!client.website) {
+  return [{
+    json: {
+      ...item,
+      websiteHtml: '',
+      websiteError: 'No website URL'
+    }
+  }];
+}
+
+try {
+  const response = await $httpRequest({
+    method: 'GET',
+    url: client.website,
+    timeout: 10000
+  });
+  
+  return [{
+    json: {
+      ...item,
+      websiteHtml: typeof response === 'string' ? response : response.body || ''
+    }
+  }];
+} catch (error) {
+  return [{
+    json: {
+      ...item,
+      websiteHtml: '',
+      websiteError: error.message
+    }
+  }];
+}"
+      },
+      "name": "Fetch Website",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1620, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;
+const client = item.client;
+const topic = item.topic;
+const html = (item.websiteHtml || '').toLowerCase();
+
+// Product categories
+const keywords = {
+  'Mode': ['kleidung', 'fashion', 'bekleidung', 'outfit', 'style'],
+  'Beauty': ['kosmetik', 'beauty', 'pflege', 'makeup', 'serum'],
+  'Home': ['möbel', 'home', 'wohnen', 'einrichtung', 'deko'],
+  'Tech': ['technik', 'gadgets', 'elektronik', 'smart'],
+  'Food': ['food', 'essen', 'kulinarik', 'gourmet', 'kaffee'],
+  'Sport': ['sport', 'fitness', 'training', 'workout'],
+  'Jewelry': ['schmuck', 'jewelry', 'uhren']
+};
+
+const products = Object.entries(keywords)
+  .filter(([_, words]) => words.some(w => html.includes(w)))
+  .map(([cat]) => cat);
+
+const finalProducts = products.length > 0 ? products : ['Produkte'];
+
+// Tone detection
+const luxury = ['luxus', 'premium', 'exklusiv', 'hochwertig', 'edel'].filter(w => html.includes(w)).length;
+const casual = ['mega', 'super', 'cool', 'easy', 'lässig'].filter(w => html.includes(w)).length;
+
+let tone = 'standard';
+if (luxury > 2) tone = 'luxury';
+else if (casual > 2) tone = 'casual';
+
+// USP
+const uspWords = ['nachhaltig', 'bio', 'vegan', 'handmade', 'regional', 'fair'];
+const usp = uspWords.find(w => html.includes(w)) || 'Qualität und Service';
+
+// Greeting
+let greeting;
+if (tone === 'luxury') greeting = `Willkommen in der Welt von ${client.firmenname}`;
+else if (tone === 'casual') greeting = 'Hey! Schön, dass du da bist';
+else greeting = `Hallo von ${client.firmenname}`;
+
+const productName = finalProducts[0];
+
+return [{
+  json: {
+    ...item,
+    analysis: {
+      products: finalProducts,
+      tone: tone,
+      usp: usp,
+      greeting: greeting,
+      subject: `${topic.name} | ${client.firmenname}`,
+      previewText: `Neue ${productName} entdecken`,
+      hook: `Unsere ${productName} überzeugen durch ${usp}.`,
+      context: `Bei uns findest du ${finalProducts.join(', ')} mit ${usp}.`,
+      guarantee: html.includes('versand') ? 'Kostenloser Versand ab 50€' : '30 Tage Rückgabe',
+      ctaText: `${productName} entdecken`
+    }
+  }
+}];"
+      },
+      "name": "Analyze Content",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1820, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;
+const client = item.client;
+const topic = item.topic;
+const analysis = item.analysis;
+const content = topic.content || '';
+const contentLines = topic.contentLines || [];
+
+// Format Notion content for email
+let contentHtml = '';
+if (contentLines.length > 0) {
+  contentHtml = contentLines.map(line => {
+    if (line.startsWith('• ')) {
+      return `<li style=\"margin: 8px 0; line-height: 1.6;\">${line.substring(2)}</li>`;
+    } else if (line.startsWith('<strong>')) {
+      return `<h3 style=\"font-size: 18px; margin: 20px 0 10px 0; color: #111;\">${line.replace(/<\/?strong>/g, '')}</h3>`;
+    } else if (line.startsWith('<em>')) {
+      return `<blockquote style=\"border-left: 4px solid #000; padding-left: 16px; margin: 20px 0; font-style: italic; color: #555;\">${line.replace(/<\/?em>/g, '').replace(/"/g, '')}</blockquote>`;
+    } else {
+      return `<p style=\"line-height: 1.7; margin: 12px 0;\">${line}</p>`;
+    }
+  }).join('');
+} else if (content) {
+  contentHtml = `<p style=\"line-height: 1.7;\">${content.replace(/\n/g, '</p><p style=\"line-height: 1.7;\">')}</p>`;
+} else {
+  contentHtml = `<p style=\"line-height: 1.7;\">Entdecke die neuesten Highlights bei ${client.firmenname}.</p>`;
+}
+
+const emailHtml = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset=\"UTF-8\">
+<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+<title>${topic.name}</title>
+</head>
+<body style=\"font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.7; color: #222; max-width: 600px; margin: 0 auto; padding: 0;\">
+
+<div style=\"display: none; max-height: 0; overflow: hidden;\">${analysis.previewText}</div>
+
+<div style=\"background: #000; color: #fff; padding: 40px 30px; text-align: center;\">
+<h1 style=\"font-size: 28px; margin: 0 0 10px 0; font-weight: 600;\">${client.firmenname}</h1>
+<p style=\"font-size: 14px; margin: 0; opacity: 0.8; text-transform: uppercase; letter-spacing: 2px;\">${topic.name}</p>
+</div>
+
+<div style=\"padding: 40px 30px;\">
+<p style=\"font-size: 18px; margin-bottom: 30px; font-weight: 500;\">${analysis.greeting},</p>
+
+<p style=\"font-size: 16px; line-height: 1.7; margin-bottom: 25px; color: #444;\">
+wir haben etwas Besonderes für dich: <strong>${topic.name}</strong>. ${analysis.hook}
+</p>
+
+<div style=\"background: #fafafa; padding: 30px; border-radius: 8px; margin: 30px 0;\">
+<h2 style=\"font-size: 20px; margin-top: 0; margin-bottom: 20px; color: #111;\">Das erwartet dich:</h2>
+${contentHtml}
+</div>
+
+<p style=\"font-size: 15px; line-height: 1.7; color: #555;\">${analysis.context}</p>
+</div>
+
+<div style=\"background: #f5f5f5; padding: 40px 30px; text-align: center;\">
+<p style=\"font-size: 16px; margin-bottom: 20px; color: #333;\">Bereit für ${analysis.products[0]}?</p>
+<a href=\"${client.website}\" style=\"display: inline-block; background: #000; color: #fff; padding: 16px 40px; text-decoration: none; border-radius: 4px; font-weight: 600; font-size: 15px; text-transform: uppercase; letter-spacing: 1px;\">${analysis.ctaText} →</a>
+<p style=\"font-size: 13px; color: #888; margin-top: 20px;\">${analysis.guarantee}</p>
+</div>
+
+<div style=\"padding: 30px; text-align: center; color: #999; font-size: 12px; border-top: 1px solid #eee;\">
+<p style=\"margin: 0 0 10px 0;\"><strong style=\"color: #333;\">${client.firmenname}</strong></p>
+<p style=\"margin: 15px 0;\"><a href=\"${client.website}\" style=\"color: #666;\">${client.website}</a></p>
+<p style=\"margin: 20px 0 0 0; font-size: 11px; color: #bbb;\">Du erhältst diese E-Mail, weil du bei ${client.firmenname} eingekauft hast.</p>
+</div>
+
+</body>
+</html>`;
+
+return [{
+  json: {
+    ...item,
+    emailHtml: emailHtml,
+    subject: analysis.subject,
+    previewText: analysis.previewText
+  }
+}];"
+      },
+      "name": "Generate Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2020, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;
+const client = item.client;
+
+try {
+  const response = await $httpRequest({
+    method: 'GET',
+    url: 'https://a.klaviyo.com/api/lists',
+    headers: {
+      'Authorization': `Klaviyo-API-Key ${client.klaviyoKey}`,
+      'revision': '2024-10-15'
+    }
+  });
+  
+  const lists = response.body?.data || [];
+  let targetList = lists[0]?.id;
+  
+  for (const list of lists) {
+    const name = list.attributes?.name?.toLowerCase() || '';
+    if (name.includes('newsletter') || name.includes('main') || name.includes('all')) {
+      targetList = list.id;
+      break;
+    }
+  }
+  
+  return [{
+    json: {
+      ...item,
+      targetList: targetList
+    }
+  }];
+} catch (error) {
+  return [{
+    json: {
+      ...item,
+      targetList: null,
+      listError: error.message
+    }
+  }];
+}"
+      },
+      "name": "Get Klaviyo Lists",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2220, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;
+const client = item.client;
+const topic = item.topic;
+const analysis = item.analysis;
+const subject = item.subject;
+const targetList = item.targetList;
+
+// Calculate send date
+const topicDate = topic.date;
+const today = new Date();
+let sendDate;
+
+if (topicDate) {
+  const topicDt = new Date(topicDate);
+  if (topicDt < today) {
+    sendDate = new Date(topicDt);
+    sendDate.setDate(sendDate.getDate() + 7);
+  } else {
+    sendDate = topicDt;
+  }
+} else {
+  sendDate = new Date(today);
+  sendDate.setDate(sendDate.getDate() + 1);
+}
+
+const sendDatetime = sendDate.toISOString().split('T')[0] + 'T09:00:00.000Z';
+
+const campaignData = {
+  data: {
+    type: 'campaign',
+    attributes: {
+      name: subject,
+      audiences: { included: targetList ? [targetList] : [] },
+      send_strategy: {
+        method: 'static',
+        options_static: { datetime: sendDatetime }
+      },
+      'campaign-messages': {
+        data: [{
+          type: 'campaign-message',
+          attributes: {
+            channel: 'email',
+            label: subject.slice(0, 50),
+            content: {
+              subject: subject,
+              preview_text: analysis.previewText
+            }
+          }
+        }]
+      }
+    }
+  }
+};
+
+try {
+  const response = await $httpRequest({
+    method: 'POST',
+    url: 'https://a.klaviyo.com/api/campaigns',
+    headers: {
+      'Authorization': `Klaviyo-API-Key ${client.klaviyoKey}`,
+      'revision': '2024-10-15',
+      'Content-Type': 'application/json'
+    },
+    body: campaignData
+  });
+  
+  return [{
+    json: {
+      client: client,
+      topic: topic,
+      subject: subject,
+      campaignId: response.body?.data?.id,
+      status: 'Created',
+      sendDate: sendDate.toISOString().split('T')[0]
+    }
+  }];
+} catch (error) {
+  return [{
+    json: {
+      client: client,
+      topic: topic,
+      subject: subject,
+      campaignId: null,
+      status: 'Failed',
+      error: error.message
+    }
+  }];
+}"
+      },
+      "name": "Create Campaign",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2420, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = $input.all();
+
+const campaigns = results.map(r => r.json);
+const successful = campaigns.filter(c => c.campaignId).length;
+const failed = campaigns.length - successful;
+
+const clientSummary = {};
+for (const camp of campaigns) {
+  if (!clientSummary[camp.client?.firmenname]) {
+    clientSummary[camp.client?.firmenname] = 0; }
+  if (camp.campaignId) clientSummary[camp.client?.firmenname]++;
+}
+
+return [{
+  json: {
+    successful,
+    failed,
+    total: campaigns.length,
+    campaigns,
+    clientSummary,
+    reportDate: new Date().toLocaleDateString('de-DE')
+  }
+}];"
+      },
+      "name": "Aggregate Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2620, 400]
+    },
+    {
+      "parameters": {
+        "chatId": "6607099798",
+        "text": "=📧 *Newsletter-Vorbereitung abgeschlossen!*
+
+*Woche:* {{ $json.reportDate }}
+*Ergebnis:* ✅ {{ $json.successful }} Campaigns erstellt | ❌ {{ $json.failed }} Fehler
+
+*Übersicht pro Kunde:*
+{{ Object.entries($json.clientSummary).map(([name, count]) => `• ${name}: ${count} Drafts`).join('\n') }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "name": "Send Telegram Report",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [2820, 400]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Notion Topics",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Airtable Clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Notion Topics": {
+      "main": [
+        [
+          {
+            "node": "Filter Topics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Airtable Clients": {
+      "main": [
+        [
+          {
+            "node": "Parse Clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Topics": {
+      "main": [
+        [
+          {
+            "node": "Get Topic Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Topic Content": {
+      "main": [
+        [
+          {
+            "node": "Mark Topics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Topics": {
+      "main": [
+        [
+          {
+            "node": "Merge Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Clients": {
+      "main": [
+        [
+          {
+            "node": "Merge Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Data": {
+      "main": [
+        [
+          {
+            "node": "Create Combos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Combos": {
+      "main": [
+        [
+          {
+            "node": "Fetch Website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Website": {
+      "main": [
+        [
+          {
+            "node": "Analyze Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Content": {
+      "main": [
+        [
+          {
+            "node": "Generate Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Email": {
+      "main": [
+        [
+          {
+            "node": "Get Klaviyo Lists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Klaviyo Lists": {
+      "main": [
+        [
+          {
+            "node": "Create Campaign",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Campaign": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Results": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  }
+}

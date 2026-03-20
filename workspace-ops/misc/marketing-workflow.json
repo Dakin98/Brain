@@ -1,0 +1,289 @@
+{
+  "name": "Apollo → Airtable → Klaviyo Pipeline",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "c67e1a88-baec-4114-99a9-a880c9d3954c",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Apollo.io API Key\nconst apiKey = $input.item.json.apolloApiKey || process.env.APOLLO_API_KEY || \"K3j_5fBy6sc4wXQ-At1Z7A\";\n\n// Search parameters\nconst searchParams = {\n  \"api_key\": apiKey,\n  \"q_organization_domains\": $input.item.json.domains || [\"shopify.com\", \"square.com\", \"stripe.com\"],\n  \"page\": 1,\n  \"person_titles\": [\"Marketing\", \"CMO\", \"Growth\", \"Performance\", \"Digital\"],\n  \"person_seniorities\": [\"director\", \"executive\", \"vp\", \"owner\"],\n  \"contact_available\": true,\n  \"num_results\": 5\n};\n\n// Construct the API request\nconst options = {\n  method: 'POST',\n  url: 'https://api.apollo.io/v1/mixed_people/search',\n  headers: {\n    'Content-Type': 'application/json',\n    'Cache-Control': 'no-cache'\n  },\n  body: JSON.stringify(searchParams)\n};\n\nreturn {\n  options: options,\n  searchParams: searchParams,\n  apiKey: apiKey\n};"
+      },
+      "id": "3c3d440c-5c2e-4c63-afca-4e8dbff3d4dd",
+      "name": "Apollo Config",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.apollo.io/v1/mixed_people/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "api_key",
+              "value": "={{ $json.apiKey }}"
+            },
+            {
+              "name": "q_organization_domains",
+              "value": "={{ $json.searchParams.q_organization_domains }}"
+            },
+            {
+              "name": "page",
+              "value": "={{ $json.searchParams.page }}"
+            },
+            {
+              "name": "person_titles",
+              "value": "={{ $json.searchParams.person_titles }}"
+            },
+            {
+              "name": "person_seniorities",
+              "value": "={{ $json.searchParams.person_seniorities }}"
+            },
+            {
+              "name": "contact_available",
+              "value": "={{ $json.searchParams.contact_available }}"
+            },
+            {
+              "name": "num_results",
+              "value": "={{ $json.searchParams.num_results }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1f3a3dd7-6e76-491e-a5d9-9b3e90148891",
+      "name": "Apollo API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        680,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Transform Apollo API response to Airtable format\nconst people = $input.item.json.people || [];\n\n// Format for Airtable\nconst airtableRecords = people.map(person => {\n  return {\n    \"fields\": {\n      \"Name\": person.name || \"\",\n      \"Email\": person.email || \"\",\n      \"Title\": person.title || \"\",\n      \"Company\": person.organization_name || \"\",\n      \"LinkedIn\": person.linkedin_url || \"\",\n      \"Phone\": person.phone_number || \"\",\n      \"Industry\": person.organization_industry || \"\",\n      \"Source\": \"Apollo.io\",\n      \"Status\": \"New Lead\",\n      \"Notes\": `Found via Apollo.io search on ${new Date().toISOString().split('T')[0]}`\n    }\n  };\n});\n\n// Data for Klaviyo profiles too\nconst klaviyoProfiles = people.map(person => {\n  return {\n    \"type\": \"profile\",\n    \"attributes\": {\n      \"email\": person.email || \"\",\n      \"first_name\": person.name ? person.name.split(' ')[0] : \"\",\n      \"last_name\": person.name ? person.name.split(' ').slice(1).join(' ') : \"\",\n      \"title\": person.title || \"\",\n      \"company\": person.organization_name || \"\",\n      \"phone_number\": person.phone_number || \"\",\n      \"properties\": {\n        \"linkedin_url\": person.linkedin_url || \"\",\n        \"industry\": person.organization_industry || \"\",\n        \"source\": \"Apollo.io\"\n      }\n    }\n  };\n});\n\nreturn {\n  airtableRecords: airtableRecords,\n  klaviyoProfiles: klaviyoProfiles,\n  peopleCount: people.length,\n  rawData: people\n};"
+      },
+      "id": "7c3d440c-5d2e-4c63-afcb-4e8dbff3d4ee",
+      "name": "Transform Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        900,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "application": "airtable",
+        "operation": "appendOrCreateTable",
+        "baseId": "={{ $json.airtableBaseId || 'appXXXXXXXXXXXXXX' }}",
+        "tableId": "={{ $json.airtableTableId || 'tblXXXXXXXXXXXXXX' }}",
+        "options": {},
+        "columns": {},
+        "additionalFields": {
+          "records": "={{ $json.airtableRecords }}"
+        }
+      },
+      "id": "3f3a3dd8-6e77-491e-a5d0-9b3e90148892",
+      "name": "Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://gateway.maton.ai/klaviyo/api/profiles",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "data",
+              "value": "={{ {\"data\": $json.klaviyoProfiles} }}"
+            }
+          ]
+        },
+        "options": {},
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer t1xQq0wltj1AZvDRA23Qvm6c-mIy6P6j_HyCC-AmwdO9E0ks6BYxPpPtOD_lXKJXB6m2xp5wa0h4YAU0fslNEL7YnBzJqjtzB1JyhVemRA"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "revision",
+              "value": "2024-10-15"
+            }
+          ]
+        }
+      },
+      "id": "4f3a3dd9-6e78-491e-a5d1-9b3e90148893",
+      "name": "Klaviyo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1120,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.cal.com/v1/bookings",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "apiKey",
+              "value": "=cal_live_f5506d0191afbe53dcb637b9ec9b447d"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "eventTypeId",
+              "value": "=174158"
+            },
+            {
+              "name": "responses",
+              "value": "={{ {\"name\": \"Discovery Call\", \"email\": $json.rawData[0].email, \"notes\": \"Lead from Apollo.io via n8n Workflow\"} }}"
+            }
+          ]
+        }
+      },
+      "id": "5f3a3dd0-6e79-491e-a5d2-9b3e90148894",
+      "name": "Cal.com (Optional)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1340,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Final Results Summary\nconst airtableResult = $inputs.Airtable?.item?.json || { records: [] };\nconst klaviyoResult = $inputs.Klaviyo?.item?.json || { data: [] };\nconst leadsFound = $inputs.item.json.peopleCount || 0;\n\nlet summaryText = `# 🚀 Marketing Workflow Results\\n\\n`;\nsummaryText += `**Leads Found**: ${leadsFound}\\n`;\nsummaryText += `**Airtable Records Created**: ${airtableResult.records?.length || 0}\\n`;\nsummaryText += `**Klaviyo Profiles Created**: ${klaviyoResult.data?.length || 0}\\n\\n`;\n\nsummaryText += `## 📋 Lead Details\\n\\n`;\n\n$inputs.item.json.rawData.forEach((person, index) => {\n  summaryText += `### ${index + 1}. ${person.name || 'Unknown'}\\n`;\n  summaryText += `- **Title**: ${person.title || 'Unknown'}\\n`;\n  summaryText += `- **Company**: ${person.organization_name || 'Unknown'}\\n`;\n  summaryText += `- **Email**: ${person.email || 'Unknown'}\\n`;\n  summaryText += `- **Phone**: ${person.phone_number || 'Unknown'}\\n`;\n  summaryText += `- **Industry**: ${person.organization_industry || 'Unknown'}\\n\\n`;\n});\n\nsummaryText += `\\n## 🔄 Workflow Details\\n\\n`;\nsummaryText += `- **Date**: ${new Date().toISOString()}\\n`;\nsummaryText += `- **Source**: Apollo.io\\n`;\nsummaryText += `- **Destinations**: Airtable, Klaviyo\\n`;\n\nreturn {\n  summaryText: summaryText,\n  markdownSummary: summaryText,\n  execTime: new Date().toISOString(),\n  stats: {\n    leadsFound: leadsFound,\n    airtableRecords: airtableResult.records?.length || 0,\n    klaviyoProfiles: klaviyoResult.data?.length || 0\n  }\n};"
+      },
+      "id": "6f3a3dd1-6e80-491e-a5d3-9b3e90148895",
+      "name": "Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1560,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Apollo Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apollo Config": {
+      "main": [
+        [
+          {
+            "node": "Apollo API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apollo API": {
+      "main": [
+        [
+          {
+            "node": "Transform Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform Data": {
+      "main": [
+        [
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Klaviyo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable": {
+      "main": [
+        [
+          {
+            "node": "Cal.com (Optional)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Klaviyo": {
+      "main": [
+        [
+          {
+            "node": "Cal.com (Optional)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cal.com (Optional)": {
+      "main": [
+        [
+          {
+            "node": "Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

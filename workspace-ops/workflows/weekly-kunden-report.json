@@ -1,0 +1,354 @@
+{
+  "name": "Weekly Kunden Performance Report",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtDay": 5,
+              "triggerAtHour": 17
+            }
+          ]
+        }
+      },
+      "id": "trigger-1",
+      "name": "Freitag 17 Uhr",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.airtable.com/v0/appbGhxy9I18oIS8E/Kunden",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": false
+            }
+          }
+        }
+      },
+      "id": "airtable-1",
+      "name": "Airtable: Get Clients",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [420, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "AIRTABLE_HEADER_AUTH",
+          "name": "Airtable API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter clients with Meta Ad Account ID and extract needed fields\nconst records = $input.first().json.records || [];\nconst clients = records\n  .filter(r => r.fields['Meta Ad Account ID'])\n  .map(r => ({\n    name: r.fields.Firmenname || r.fields.Name || '',\n    ad_account_id: String(r.fields['Meta Ad Account ID']).replace('act_', ''),\n    email: r.fields['AP E-Mail'] || r.fields.Email || '',\n    sheet_id: extractSheetId(r.fields['Reporting Sheet'] || ''),\n    weekly_budget: r.fields.Wochenbudget || 0,\n    airtable_id: r.id\n  }))\n  .filter(c => c.sheet_id);\n\nfunction extractSheetId(url) {\n  const m = url.match(/\\/d\\/([a-zA-Z0-9_-]+)/);\n  return m ? m[1] : url;\n}\n\nreturn clients.map(c => ({ json: c }));"
+      },
+      "id": "code-filter",
+      "name": "Filter & Transform Clients",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [640, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://graph.facebook.com/v21.0/act_{{ $json.ad_account_id }}/insights",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "impressions,clicks,ctr,cpc,cpm,spend,actions,action_values,purchase_roas"
+            },
+            {
+              "name": "time_range",
+              "value": "={{ JSON.stringify({ since: new Date(Date.now() - 7*86400000).toISOString().split('T')[0], until: new Date(Date.now() - 86400000).toISOString().split('T')[0] }) }}"
+            },
+            {
+              "name": "time_increment",
+              "value": "1"
+            },
+            {
+              "name": "limit",
+              "value": "500"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "meta-daily",
+      "name": "Meta: Daily Insights",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [860, 200],
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "META_ADS_TOKEN",
+          "name": "Meta Ads Access Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://graph.facebook.com/v21.0/act_{{ $json.ad_account_id }}/insights",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "campaign_id,campaign_name,objective,spend,impressions,clicks,ctr,cpm,actions,action_values,cost_per_action_type"
+            },
+            {
+              "name": "time_range",
+              "value": "={{ JSON.stringify({ since: new Date(Date.now() - 7*86400000).toISOString().split('T')[0], until: new Date(Date.now() - 86400000).toISOString().split('T')[0] }) }}"
+            },
+            {
+              "name": "level",
+              "value": "campaign"
+            },
+            {
+              "name": "limit",
+              "value": "500"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "meta-campaigns",
+      "name": "Meta: Campaign Insights",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [860, 400],
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "META_ADS_TOKEN",
+          "name": "Meta Ads Access Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Combine daily + campaign data, build sheet rows\nconst client = $('Filter & Transform Clients').item.json;\nconst dailyData = $('Meta: Daily Insights').item.json.data || [];\nconst campData = $('Meta: Campaign Insights').item.json.data || [];\n\nconst kw = getWeekNumber(new Date());\nconst since = new Date(Date.now() - 7*86400000).toISOString().split('T')[0];\nconst until = new Date(Date.now() - 86400000).toISOString().split('T')[0];\n\nfunction getWeekNumber(d) {\n  d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));\n  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));\n  const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));\n  return Math.ceil((((d - yearStart) / 86400000) + 1)/7);\n}\n\nfunction extractAction(actions, types) {\n  if (!actions) return 0;\n  for (const t of types) {\n    const found = actions.find(a => a.action_type === t);\n    if (found) return parseFloat(found.value) || 0;\n  }\n  return 0;\n}\n\nconst purchaseTypes = ['offsite_conversion.fb_pixel_purchase', 'purchase', 'omni_purchase'];\n\n// Daily rows for Charts Data tab\nconst dailyRows = [['Datum','Spend','Impressions','Clicks','CTR','CPC','CPM','ROAS','Purchases','Revenue']];\nlet totalSpend = 0, totalImp = 0, totalClicks = 0, totalPurchases = 0, totalRevenue = 0;\n\nfor (const d of dailyData.sort((a,b) => a.date_start.localeCompare(b.date_start))) {\n  const spend = parseFloat(d.spend || 0);\n  const imp = parseInt(d.impressions || 0);\n  const clicks = parseInt(d.clicks || 0);\n  const purchases = extractAction(d.actions, purchaseTypes);\n  const revenue = extractAction(d.action_values, purchaseTypes);\n  const roas = d.purchase_roas?.[0]?.value ? parseFloat(d.purchase_roas[0].value) : (spend > 0 ? revenue/spend : 0);\n  totalSpend += spend; totalImp += imp; totalClicks += clicks; totalPurchases += purchases; totalRevenue += revenue;\n  dailyRows.push([d.date_start, Math.round(spend*100)/100, imp, clicks, Math.round(parseFloat(d.ctr||0)*100)/100, Math.round(parseFloat(d.cpc||0)*100)/100, Math.round(parseFloat(d.cpm||0)*100)/100, Math.round(roas*100)/100, purchases, Math.round(revenue*100)/100]);\n}\n\n// Campaign rows\nconst campRows = [['Campaign','Objective','Spend','Impressions','Clicks','CTR','Purchases','Revenue','ROAS','CPA']];\nfor (const c of campData.sort((a,b) => parseFloat(b.spend||0) - parseFloat(a.spend||0))) {\n  const spend = parseFloat(c.spend||0);\n  const purchases = extractAction(c.actions, purchaseTypes);\n  const revenue = extractAction(c.action_values, purchaseTypes);\n  campRows.push([c.campaign_name, c.objective, Math.round(spend*100)/100, parseInt(c.impressions||0), parseInt(c.clicks||0), Math.round(parseFloat(c.ctr||0)*100)/100, purchases, Math.round(revenue*100)/100, spend>0?Math.round(revenue/spend*100)/100:0, purchases>0?Math.round(spend/purchases*100)/100:0]);\n}\n\n// Summary\nconst avgCtr = totalImp > 0 ? Math.round(totalClicks/totalImp*10000)/100 : 0;\nconst avgRoas = totalSpend > 0 ? Math.round(totalRevenue/totalSpend*100)/100 : 0;\nconst cpa = totalPurchases > 0 ? Math.round(totalSpend/totalPurchases*100)/100 : 0;\nconst wb = client.weekly_budget || 0;\n\nconst summaryRows = [\n  ['Weekly Performance Summary'],\n  [`Zeitraum: ${since} bis ${until} (KW${kw})`],\n  [''],\n  ['📊 KPIs',''],\n  ['Total Spend', `€${totalSpend.toFixed(2)}`],\n  ['Impressions', totalImp.toLocaleString()],\n  ['Clicks', totalClicks.toLocaleString()],\n  ['CTR', `${avgCtr}%`],\n  ['Purchases', totalPurchases],\n  ['Revenue', `€${totalRevenue.toFixed(2)}`],\n  ['ROAS', `${avgRoas}x`],\n  ['Cost per Purchase', `€${cpa}`],\n  [''],\n  ['💰 Budget Status',''],\n  ['Wochenbudget', wb ? `€${wb.toFixed(2)}` : 'N/A'],\n  ['Ausgegeben', `€${totalSpend.toFixed(2)}`],\n  ['Verbrauch', wb ? `${Math.round(totalSpend/wb*100)}%` : 'N/A'],\n];\n\nreturn [{\n  json: {\n    ...client,\n    kw,\n    since,\n    until,\n    summary: { totalSpend, totalImp, totalClicks, avgCtr, totalPurchases, totalRevenue, avgRoas, cpa },\n    sheets: { dailyRows, campRows, summaryRows }\n  }\n}];"
+      },
+      "id": "code-transform",
+      "name": "Transform & Build Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, 300]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://sheets.googleapis.com/v4/spreadsheets/{{ $json.sheet_id }}/values/Weekly%20Summary!A1?valueInputOption=USER_ENTERED",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "range",
+              "value": "Weekly Summary!A1"
+            },
+            {
+              "name": "values",
+              "value": "={{ JSON.stringify($json.sheets.summaryRows) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "sheets-summary",
+      "name": "Sheets: Write Summary",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 160],
+      "credentials": {
+        "oAuth2Api": {
+          "id": "GOOGLE_SHEETS_OAUTH",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://sheets.googleapis.com/v4/spreadsheets/{{ $json.sheet_id }}/values/Charts%20Data!A1?valueInputOption=USER_ENTERED",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "range",
+              "value": "Charts Data!A1"
+            },
+            {
+              "name": "values",
+              "value": "={{ JSON.stringify($json.sheets.dailyRows) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "sheets-charts",
+      "name": "Sheets: Write Charts Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 300],
+      "credentials": {
+        "oAuth2Api": {
+          "id": "GOOGLE_SHEETS_OAUTH",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://sheets.googleapis.com/v4/spreadsheets/{{ $json.sheet_id }}/values/Campaign%20Performance!A1?valueInputOption=USER_ENTERED",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "range",
+              "value": "Campaign Performance!A1"
+            },
+            {
+              "name": "values",
+              "value": "={{ JSON.stringify($json.sheets.campRows) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "sheets-campaigns",
+      "name": "Sheets: Write Campaigns",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 440],
+      "credentials": {
+        "oAuth2Api": {
+          "id": "GOOGLE_SHEETS_OAUTH",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build HTML email from report data\nconst d = $input.first().json;\nconst s = d.summary;\n\nconst campTableRows = (d.sheets.campRows || []).slice(1, 6).map(c => \n  `<tr><td><strong>${c[0]}</strong></td><td>€${c[2]}</td><td>${c[8]}x</td><td>${c[5]}%</td><td>${c[6]}</td></tr>`\n).join('\\n');\n\nconst html = `<!DOCTYPE html>\n<html><head><meta charset=\"utf-8\"><style>\nbody{margin:0;padding:0;font-family:'Helvetica Neue',Arial,sans-serif;background:#f4f4f7;color:#333}\n.c{max-width:640px;margin:0 auto;background:#fff}\n.h{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:32px 40px;text-align:center}\n.h h1{color:#fff;font-size:22px;margin:0;font-weight:600}\n.h .sub{color:#a0aec0;font-size:14px;margin-top:6px}\n.s{padding:28px 40px}\n.st{font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#1a1a2e;margin-bottom:16px;border-bottom:2px solid #e2e8f0;padding-bottom:8px}\n.kg{display:flex;flex-wrap:wrap;gap:12px}\n.kc{flex:1;min-width:120px;background:#f7fafc;border-radius:8px;padding:16px;text-align:center}\n.kv{font-size:24px;font-weight:700;color:#1a1a2e}\n.kl{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#718096;margin-top:4px}\ntable{width:100%;border-collapse:collapse;font-size:13px}\nth{text-align:left;padding:10px 12px;background:#f7fafc;color:#718096;font-size:11px;text-transform:uppercase}\ntd{padding:10px 12px;border-bottom:1px solid #edf2f7}\n.btn{display:inline-block;background:#1a1a2e;color:#fff!important;padding:12px 28px;border-radius:6px;text-decoration:none;font-weight:600;font-size:14px;margin-top:16px}\n.ft{background:#f7fafc;padding:24px 40px;text-align:center;font-size:12px;color:#a0aec0}\n</style></head><body>\n<div class=\"c\">\n<div class=\"h\"><h1>Weekly Performance Report</h1><div class=\"sub\">${d.name} · KW${d.kw} · ${d.since} – ${d.until}</div></div>\n<div class=\"s\"><div class=\"st\">📊 Performance Overview</div>\n<div class=\"kg\">\n<div class=\"kc\"><div class=\"kv\">€${s.totalSpend.toFixed(2)}</div><div class=\"kl\">Ad Spend</div></div>\n<div class=\"kc\"><div class=\"kv\">${s.avgRoas}x</div><div class=\"kl\">ROAS</div></div>\n<div class=\"kc\"><div class=\"kv\">${s.totalPurchases}</div><div class=\"kl\">Conversions</div></div>\n<div class=\"kc\"><div class=\"kv\">${s.avgCtr}%</div><div class=\"kl\">CTR</div></div>\n<div class=\"kc\"><div class=\"kv\">€${s.cpa}</div><div class=\"kl\">Cost/Conv.</div></div>\n</div></div>\n<hr style=\"border:0;height:1px;background:#e2e8f0;margin:0\">\n<div class=\"s\"><div class=\"st\">🎯 Campaign Performance</div>\n<table><thead><tr><th>Campaign</th><th>Spend</th><th>ROAS</th><th>CTR</th><th>Conv.</th></tr></thead>\n<tbody>${campTableRows}</tbody></table></div>\n<div class=\"s\" style=\"text-align:center\"><a href=\"https://docs.google.com/spreadsheets/d/${d.sheet_id}/edit\" class=\"btn\">📄 Zum vollständigen Report</a></div>\n<div class=\"ft\"><p>Automatisch erstellt von <strong>adsdrop</strong></p></div>\n</div></body></html>`;\n\nreturn [{ json: { ...d, emailHtml: html, emailSubject: `Weekly Performance Report - ${d.name} - KW${d.kw}` } }];"
+      },
+      "id": "code-email",
+      "name": "Build Email HTML",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1560, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "deniz@adsdrop.de",
+        "toEmail": "={{ $json.email }}",
+        "subject": "={{ $json.emailSubject }}",
+        "emailType": "html",
+        "html": "={{ $json.emailHtml }}",
+        "options": {}
+      },
+      "id": "email-send",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1780, 300],
+      "credentials": {
+        "smtp": {
+          "id": "SMTP_CREDENTIALS",
+          "name": "SMTP adsdrop"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if-email",
+      "name": "Has Email?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1560, 500]
+    }
+  ],
+  "connections": {
+    "Freitag 17 Uhr": {
+      "main": [[{ "node": "Airtable: Get Clients", "type": "main", "index": 0 }]]
+    },
+    "Airtable: Get Clients": {
+      "main": [[{ "node": "Filter & Transform Clients", "type": "main", "index": 0 }]]
+    },
+    "Filter & Transform Clients": {
+      "main": [[
+        { "node": "Meta: Daily Insights", "type": "main", "index": 0 },
+        { "node": "Meta: Campaign Insights", "type": "main", "index": 0 }
+      ]]
+    },
+    "Meta: Daily Insights": {
+      "main": [[{ "node": "Transform & Build Report", "type": "main", "index": 0 }]]
+    },
+    "Meta: Campaign Insights": {
+      "main": [[{ "node": "Transform & Build Report", "type": "main", "index": 0 }]]
+    },
+    "Transform & Build Report": {
+      "main": [[
+        { "node": "Sheets: Write Summary", "type": "main", "index": 0 },
+        { "node": "Sheets: Write Charts Data", "type": "main", "index": 0 },
+        { "node": "Sheets: Write Campaigns", "type": "main", "index": 0 },
+        { "node": "Build Email HTML", "type": "main", "index": 0 }
+      ]]
+    },
+    "Build Email HTML": {
+      "main": [[{ "node": "Has Email?", "type": "main", "index": 0 }]]
+    },
+    "Has Email?": {
+      "main": [
+        [{ "node": "Send Email", "type": "main", "index": 0 }],
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "tags": [
+    { "name": "reporting" },
+    { "name": "weekly" },
+    { "name": "clients" }
+  ]
+}

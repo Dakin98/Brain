@@ -1,0 +1,394 @@
+{
+  "name": "Paid Ads: Kunde → ClickUp Tasks (HTTP Version)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "expression": "1"
+            }
+          ]
+        }
+      },
+      "id": "trigger-1",
+      "name": "Daily 9am",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.airtable.com/v0/appbGhxy9I18oIS8E/Kunden",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "filterByFormula",
+              "value": "AND({Status}='Active', FIND('Paid Ads', {Services}), OR({ClickUp Folder ID}='', {ClickUp Folder ID}=BLANK()))"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "http-1",
+      "name": "HTTP: Airtable Kunden holen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        450,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "YOUR_HTTP_CREDENTIAL_ID",
+          "name": "Airtable Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-1",
+              "leftValue": "={{ $json.records.length }}",
+              "rightValue": "0",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if-1",
+      "name": "Kunden gefunden?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.0,
+      "position": [
+        650,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.clickup.com/api/v2/space/90040311585/folder",
+        "sendBody": true,
+        "contentType": "json",
+        "body": {
+          "name": "={{ $json.fields.Firmenname }}"
+        },
+        "options": {}
+      },
+      "id": "http-2",
+      "name": "HTTP: ClickUp Folder erstellen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        850,
+        200
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "YOUR_CLICKUP_AUTH_ID",
+          "name": "ClickUp Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://api.airtable.com/v0/appbGhxy9I18oIS8E/Kunden/' + $json.id }}",
+        "sendBody": true,
+        "contentType": "json",
+        "body": {
+          "fields": {
+            "ClickUp Folder ID": "={{ $node['HTTP: ClickUp Folder erstellen'].json.id }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "http-3",
+      "name": "HTTP: Airtable Folder ID updaten",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1050,
+        200
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "YOUR_HTTP_CREDENTIAL_ID",
+          "name": "Airtable Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://api.clickup.com/api/v2/folder/' + $node['HTTP: ClickUp Folder erstellen'].json.id + '/list' }}",
+        "sendBody": true,
+        "contentType": "json",
+        "body": {
+          "name": "📝 Creative Pipeline"
+        },
+        "options": {}
+      },
+      "id": "http-4",
+      "name": "HTTP: ClickUp Liste erstellen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1250,
+        200
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "YOUR_CLICKUP_AUTH_ID",
+          "name": "ClickUp Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Tasks mit Due Dates generieren\nconst kunde = $input.first().json.fields.Firmenname;\nconst listId = $node['HTTP: ClickUp Liste erstellen'].json.id;\n\nconst tasks = [\n  { name: '🚀 Kickoff Call', offset: 0, desc: 'Erstgespräch mit ' + kunde + '. Ziele, Budget, Briefing besprechen.' },\n  { name: '🔍 Tracking Audit', offset: 1, desc: 'GTM, Pixel, CAPI, GA4 prüfen und sicherstellen.' },\n  { name: '📊 Account Analysis', offset: 2, desc: 'Bestandsaufnahse: Was lief bisher? Winner & Loser identifizieren.' },\n  { name: '💡 Creative Briefing', offset: 3, desc: 'Angles, Hooks & Konzepte für ersten Batch definieren.' },\n  { name: '🎬 Creative Produktion', offset: 5, desc: '5 Creatives produzieren: Editing, Motion, Sound, Export.' },\n  { name: '👁️ Kunden Review', offset: 8, desc: 'Creatives präsentieren, Feedback sammeln, Finalisierung.' },\n  { name: '🚀 Campaign Launch', offset: 10, desc: 'Ads live schalten: €50/Tag Test-Budget, Tracking prüfen.' },\n  { name: '📈 Performance Check (Tag 3)', offset: 13, desc: 'Erste Analyse nach 3 Tagen: Daten auswerten, Optimierung.' },\n  { name: '🏆 Performance Check (Tag 7)', offset: 17, desc: 'Nach 7 Tagen: Winner identifizieren, Loser pausieren, Scale-Plan.' }\n];\n\nconst now = new Date();\n\nreturn tasks.map(task => {\n  const dueDate = new Date(now);\n  dueDate.setDate(dueDate.getDate() + task.offset);\n  \n  return {\n    json: {\n      name: task.name + ' — ' + kunde,\n      description: task.desc,\n      listId: listId,\n      dueDate: dueDate.getTime(), // Unix timestamp für ClickUp\n      kunde: kunde\n    }\n  };\n});"
+      },
+      "id": "code-1",
+      "name": "Code: Tasks generieren",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2.0,
+      "position": [
+        1450,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "split-1",
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3.0,
+      "position": [
+        1650,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://api.clickup.com/api/v2/list/' + $json.listId + '/task' }}",
+        "sendBody": true,
+        "contentType": "json",
+        "body": {
+          "name": "={{ $json.name }}",
+          "description": "={{ $json.description }}",
+          "due_date": "={{ $json.dueDate }}",
+          "assignees": [
+            63066979
+          ]
+        },
+        "options": {}
+      },
+      "id": "http-5",
+      "name": "HTTP: ClickUp Task erstellen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1850,
+        200
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "YOUR_CLICKUP_AUTH_ID",
+          "name": "ClickUp Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "✅ *Neuer Paid Ads Kunde angelegt!*\n\nKunde: {{ $node['Code: Tasks generieren'].json.kunde }}\nFolder: {{ $node['HTTP: ClickUp Folder erstellen'].json.name }}\nTasks: 9 erstellt\n\nNächste Schritte:\n1. Kickoff Call terminieren\n2. Zugänge prüfen\n\nAlle Tasks sind in ClickUp mit Due Dates.",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "telegram-1",
+      "name": "Telegram: Erfolg",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        2050,
+        200
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "❌ *Keine neuen Paid Ads Kunden*\n\nKeine Kunden mit Status='Active' und Services='Paid Ads' und leerer ClickUp Folder ID gefunden.",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "telegram-2",
+      "name": "Telegram: Keine Kunden",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        850,
+        400
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Daily 9am": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Airtable Kunden holen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Airtable Kunden holen": {
+      "main": [
+        [
+          {
+            "node": "Kunden gefunden?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kunden gefunden?": {
+      "main": [
+        [
+          {
+            "node": "HTTP: ClickUp Folder erstellen",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram: Keine Kunden",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: ClickUp Folder erstellen": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Airtable Folder ID updaten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Airtable Folder ID updaten": {
+      "main": [
+        [
+          {
+            "node": "HTTP: ClickUp Liste erstellen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: ClickUp Liste erstellen": {
+      "main": [
+        [
+          {
+            "node": "Code: Tasks generieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code: Tasks generieren": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches": {
+      "main": [
+        [
+          {
+            "node": "HTTP: ClickUp Task erstellen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: ClickUp Task erstellen": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram: Keine Kunden": {
+      "main": [
+        [
+          {
+            "node": "Telegram: Erfolg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": []
+}

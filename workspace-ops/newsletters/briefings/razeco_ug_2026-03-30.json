@@ -1,0 +1,38 @@
+{
+  "briefing_id": "razeco_ug_2026-03-30",
+  "created_at": "2026-02-25T17:05:30.944197",
+  "status": "done",
+  "client": {
+    "name": "Razeco UG",
+    "website": "https://razeco.de",
+    "language": "de"
+  },
+  "topic": {
+    "name": "Combos/Bundles/Buy together",
+    "date": "2026-03-30",
+    "briefing": "A \"Cross-sell/Bundles/Buy together\" email is a marketing strategy used to promote complementary products that are a good fit if you buy them together or in bundles. This type of email is designed to increase sales and AOV by offering them additional products that fit well together (Mcdonald's example - fries & burger). Here are some ideas for what to include in such an email:\nShow related products: Show images of related products that would complement other products on your website. This could include accessories, upgrades, or add-ons that would enhance the customer's experience with any other best-selling product on your store (example - watches & Cases, jewelry & gift packaging)\nUse persuasive language: Use persuasive language to highlight the benefits of purchasing additional products. For example, you could highlight how purchasing a bundle would save the customer money or how buying a related product would enhance their overall experience.\nUse customer reviews: Use customer reviews or testimonials to show how others have benefited from purchasing the related products. This will provide social proof and help to increase the perceived value of the additional products or services.\nUse bundled or combo offers: Show the bundled or combo offers, including a main product and additional product/s together with the price difference, this way customer can see how much they can save by buying both items together.\nThe goal of the \"Cross-sell/Bundles/Buy together\" email is to increase sales and average order value by promoting complementary products that are a good fit if bought together or in bundles. The email aims to encourage customers to purchase additional products that complement other products on the website, thus enhancing their overall experience and potentially saving them money by bundling items together. The email may include images of related products, persuasive language, customer reviews, and bundled or combo offers to achieve its goal."
+  },
+  "copy": {
+    "subject": "Besser zusammen: Spare mit unserem Bundle! 💡",
+    "preview": "Kombiniere deine Rasurroutine und spare jetzt!",
+    "headline": "Doppelte Power, doppelte Ersparnis",
+    "body": [
+      "Stell dir vor, du steigst aus der Dusche, fühlst dich frisch und siehst blendend aus – und das alles mit einem einzigen, klugen Einkauf. Unser System Bundle macht es möglich.",
+      "",
+      "Mit dem biobasierten System Razor für Gesicht und Körper bist du perfekt ausgestattet, um jeden Tag selbstbewusst zu rocken. Hergestellt aus 99% biobasierten Materialien, bist du nicht nur gut zu dir selbst, sondern auch zur Umwelt.",
+      "✓ 99% biobasiert und umweltfreundlich",
+      "✓ TÜV Austria 4-Sterne zertifiziert",
+      "✓ Schwedische Premium-Stahlklingen, designed in der Schweiz",
+      "",
+      "12.000+ zufriedene Kunden können nicht irren. Sei Teil der Bewegung und entdecke, warum wir die erste Marke mit biobasierten Klingen weltweit sind.",
+      "",
+      "Hol dir das System Bundle für nur €37.96 (statt €49.98) und spare €12. Dein Gesicht und dein Körper werden es dir danken. Aber beeil dich, das Angebot gilt nur für kurze Zeit."
+    ],
+    "cta": "Jetzt Bundle sichern →",
+    "closing": "Auf eine grüne Zukunft<br>Dein Razeco Team",
+    "products_to_show": [
+      "system_bundle",
+      "system_razor_face"
+    ]
+  }
+}

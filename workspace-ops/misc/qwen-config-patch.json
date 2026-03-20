@@ -1,0 +1,26 @@
+{
+  "auth": {
+    "profiles": {
+      "anthropic:default": {
+        "provider": "anthropic",
+        "mode": "token"
+      },
+      "ollama:local": {
+        "provider": "ollama",
+        "baseUrl": "http://localhost:11434",
+        "mode": "direct"
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "anthropic/claude-sonnet-4-20250514",
+        "alternatives": {
+          "coder": "ollama/qwen2.5-coder:32b",
+          "fast": "ollama/qwen2.5-coder:32b"
+        }
+      }
+    }
+  }
+}

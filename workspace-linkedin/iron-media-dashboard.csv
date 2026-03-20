@@ -1,0 +1,6 @@
+Metric,Gestern,Letzte 7 Tage,Letzte 30 Tage,Ziel,Status,Trend
+ncROAS,2.3,2.1,2.0,2.0,"=IF(B2>E2,""🟢 Gut"",IF(B2>E2*0.8,""🟡 Okay"",""🔴 Kritisch""))","=IF(B2>C2,""📈"",IF(B2<C2,""📉"",""➡️""))"
+Payback Period (Tage),18,22,25,30,"=IF(B3<E3,""🟢 Gut"",IF(B3<E3*2,""🟡 Okay"",""🔴 Kritisch""))","=IF(B3<C3,""📈"",IF(B3>C3,""📉"",""➡️""))"
+LTV/CAC Ratio,4.2,4.0,3.8,3.5,"=IF(B4>E4,""🟢 Gut"",IF(B4>E4*0.8,""🟡 Okay"",""🔴 Kritisch""))","=IF(B4>C4,""📈"",IF(B4<C4,""📉"",""➡️""))"
+MER,4.5,4.2,4.0,4.0,"=IF(B5>E5,""🟢 Gut"",IF(B5>E5*0.8,""🟡 Okay"",""🔴 Kritisch""))","=IF(B5>C5,""📈"",IF(B5<C5,""📉"",""➡️""))"
+Contribution Margin (%),0.28,0.26,0.24,0.2,"=IF(B6>E6,""🟢 Gut"",IF(B6>E6*0.8,""🟡 Okay"",""🔴 Kritisch""))","=IF(B6>C6,""📈"",IF(B6<C6,""📉"",""➡️""))"

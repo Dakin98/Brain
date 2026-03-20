@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meta Ads Dashboard — Razeco UG</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+  :root {
+    --bg: #fafafa; --card: #fff; --text: #1a1a1a; --muted: #888;
+    --accent: #2563eb; --accent2: #10b981; --red: #ef4444;
+    --border: #e5e7eb; --radius: 12px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); }
+  
+  .header { padding: 32px 40px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .header h1 { font-size: 24px; font-weight: 700; }
+  .header .subtitle { color: var(--muted); font-size: 14px; margin-top: 4px; }
+  
+  .filters { display: flex; gap: 12px; align-items: center; }
+  .filters select, .filters input { padding: 8px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background: var(--card); }
+  
+  .container { padding: 0 40px 40px; max-width: 1400px; margin: 0 auto; }
+  
+  /* KPI Cards */
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .kpi-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+  .kpi-card .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .kpi-card .value { font-size: 28px; font-weight: 700; }
+  .kpi-card .change { font-size: 13px; margin-top: 6px; }
+  .kpi-card .change.up { color: var(--accent2); }
+  .kpi-card .change.down { color: var(--red); }
+  
+  /* Charts */
+  .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+  .chart-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
+  .chart-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+  
+  /* Creative Gallery */
+  .section-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+  .creative-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-bottom: 32px; }
+  .creative-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: box-shadow 0.2s; }
+  .creative-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+  .creative-card img { width: 100%; height: 180px; object-fit: cover; background: #f0f0f0; }
+  .creative-card .info { padding: 16px; }
+  .creative-card .name { font-size: 14px; font-weight: 600; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .creative-card .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .creative-card .metric { }
+  .creative-card .metric .ml { font-size: 11px; color: var(--muted); text-transform: uppercase; }
+  .creative-card .metric .mv { font-size: 15px; font-weight: 600; }
+  
+  /* Table */
+  .table-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 32px; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--border); color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  tr:hover { background: #f9fafb; }
+  
+  .tab-bar { display: flex; gap: 4px; margin-bottom: 24px; }
+  .tab-bar button { padding: 8px 20px; border: 1px solid var(--border); border-radius: 8px; background: var(--card); cursor: pointer; font-size: 14px; }
+  .tab-bar button.active { background: var(--text); color: white; border-color: var(--text); }
+  
+  .loading { text-align: center; padding: 60px; color: var(--muted); font-size: 16px; }
+  
+  @media (max-width: 768px) {
+    .header { padding: 20px; }
+    .container { padding: 0 20px 20px; }
+    .chart-row { grid-template-columns: 1fr; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>Meta Ads Dashboard</h1>
+    <div class="subtitle">Razeco UG — Performance Overview</div>
+  </div>
+  <div class="filters">
+    <select id="monthFilter"><option value="all">Alle Monate</option></select>
+    <select id="compareFilter"><option value="">Vergleich: —</option></select>
+  </div>
+</div>
+
+<div class="container">
+  <div id="loading" class="loading">Dashboard lädt...</div>
+  
+  <div id="dashboard" style="display:none;">
+    <!-- KPI Cards -->
+    <div class="kpi-grid" id="kpiGrid"></div>
+    
+    <!-- Charts -->
+    <div class="chart-row">
+      <div class="chart-card">
+        <h3>Spend & ROAS Trend</h3>
+        <canvas id="trendChart"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Conversions & Cost/Conversion</h3>
+        <canvas id="convChart"></canvas>
+      </div>
+    </div>
+    
+    <div class="chart-row">
+      <div class="chart-card">
+        <h3>Impressions & Reach</h3>
+        <canvas id="reachChart"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>CTR & CPC Trend</h3>
+        <canvas id="ctrChart"></canvas>
+      </div>
+    </div>
+    
+    <!-- Tabs -->
+    <div class="tab-bar">
+      <button class="active" onclick="showTab('creatives')">Top Creatives</button>
+      <button onclick="showTab('campaigns')">Campaigns</button>
+      <button onclick="showTab('adsets')">Ad Sets</button>
+    </div>
+    
+    <!-- Creative Gallery -->
+    <div id="tab-creatives">
+      <div class="creative-grid" id="creativeGrid"></div>
+    </div>
+    
+    <!-- Campaign Table -->
+    <div id="tab-campaigns" style="display:none;">
+      <div class="table-card">
+        <table id="campaignTable"></table>
+      </div>
+    </div>
+    
+    <!-- Ad Set Table -->
+    <div id="tab-adsets" style="display:none;">
+      <div class="table-card">
+        <table id="adsetTable"></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SHEET_ID = '1XTMtZwPRQVR7pRZv2ZZQC_pC5_61JIhkclOsCn1uESA';
+let campaignData = [], adsetData = [], creativeData = [];
+let charts = {};
+
+async function fetchSheet(tab) {
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(tab)}`;
+  const resp = await fetch(url);
+  const text = await resp.text();
+  const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\((.*)\)/s)[1]);
+  const cols = json.table.cols.map(c => c.label);
+  return json.table.rows.map(r => {
+    const obj = {};
+    r.c.forEach((cell, i) => { obj[cols[i]] = cell ? (cell.v ?? '') : ''; });
+    return obj;
+  });
+}
+
+function fmt(n, type) {
+  if (type === 'money') return '€' + Number(n).toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  if (type === 'pct') return Number(n).toFixed(2) + '%';
+  if (type === 'num') return Number(n).toLocaleString('de-DE');
+  if (type === 'x') return Number(n).toFixed(2) + 'x';
+  return n;
+}
+
+function calcChange(current, previous) {
+  if (!previous || previous === 0) return null;
+  return ((current - previous) / previous * 100).toFixed(1);
+}
+
+function filterByMonth(data, month) {
+  if (month === 'all') return data;
+  return data.filter(d => d.Monat === month);
+}
+
+function aggregate(data, month) {
+  const filtered = filterByMonth(data, month);
+  const spend = filtered.reduce((s, d) => s + Number(d.Spend || 0), 0);
+  const impressions = filtered.reduce((s, d) => s + Number(d.Impressions || 0), 0);
+  const reach = filtered.reduce((s, d) => s + Number(d.Reach || 0), 0);
+  const clicks = filtered.reduce((s, d) => s + Number(d.Clicks || 0), 0);
+  const conversions = filtered.reduce((s, d) => s + Number(d.Conversions || 0), 0);
+  const ctr = impressions > 0 ? (clicks / impressions * 100) : 0;
+  const cpm = impressions > 0 ? (spend / impressions * 1000) : 0;
+  const cpc = clicks > 0 ? (spend / clicks) : 0;
+  const costPerConv = conversions > 0 ? (spend / conversions) : 0;
+  const roas = spend > 0 ? (filtered.reduce((s, d) => s + Number(d.ROAS || 0) * Number(d.Spend || 0), 0) / spend) : 0;
+  const frequency = reach > 0 ? (impressions / reach) : 0;
+  return { spend, impressions, reach, clicks, conversions, ctr, cpm, cpc, costPerConv, roas, frequency };
+}
+
+function renderKPIs(current, compare) {
+  const kpis = [
+    { label: 'Spend', value: fmt(current.spend, 'money'), key: 'spend' },
+    { label: 'Impressions', value: fmt(current.impressions, 'num'), key: 'impressions' },
+    { label: 'Clicks', value: fmt(current.clicks, 'num'), key: 'clicks' },
+    { label: 'CTR', value: fmt(current.ctr, 'pct'), key: 'ctr' },
+    { label: 'CPM', value: fmt(current.cpm, 'money'), key: 'cpm' },
+    { label: 'CPC', value: fmt(current.cpc, 'money'), key: 'cpc' },
+    { label: 'Conversions', value: fmt(current.conversions, 'num'), key: 'conversions' },
+    { label: 'Cost/Conv', value: fmt(current.costPerConv, 'money'), key: 'costPerConv', invert: true },
+    { label: 'ROAS', value: fmt(current.roas, 'x'), key: 'roas' },
+    { label: 'Reach', value: fmt(current.reach, 'num'), key: 'reach' },
+    { label: 'Frequency', value: current.frequency.toFixed(2), key: 'frequency' },
+  ];
+  
+  document.getElementById('kpiGrid').innerHTML = kpis.map(k => {
+    let changeHtml = '';
+    if (compare) {
+      const pct = calcChange(current[k.key], compare[k.key]);
+      if (pct !== null) {
+        const isGood = k.invert ? pct < 0 : pct > 0;
+        changeHtml = `<div class="change ${isGood ? 'up' : 'down'}">${pct > 0 ? '+' : ''}${pct}% vs Vergleich</div>`;
+      }
+    }
+    return `<div class="kpi-card"><div class="label">${k.label}</div><div class="value">${k.value}</div>${changeHtml}</div>`;
+  }).join('');
+}
+
+function renderTrendCharts() {
+  const months = [...new Set(campaignData.map(d => d.Monat))].sort();
+  const monthlyData = months.map(m => aggregate(campaignData, m));
+  
+  const chartOpts = { responsive: true, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true } } };
+  
+  // Spend & ROAS
+  if (charts.trend) charts.trend.destroy();
+  charts.trend = new Chart(document.getElementById('trendChart'), {
+    type: 'bar',
+    data: {
+      labels: months,
+      datasets: [
+        { label: 'Spend (€)', data: monthlyData.map(d => d.spend), backgroundColor: 'rgba(37,99,235,0.7)', yAxisID: 'y' },
+        { label: 'ROAS', data: monthlyData.map(d => d.roas), type: 'line', borderColor: '#10b981', backgroundColor: 'transparent', yAxisID: 'y1', tension: 0.3 }
+      ]
+    },
+    options: { ...chartOpts, scales: { y: { beginAtZero: true, position: 'left' }, y1: { beginAtZero: true, position: 'right', grid: { display: false } } } }
+  });
+  
+  // Conversions & Cost/Conv
+  if (charts.conv) charts.conv.destroy();
+  charts.conv = new Chart(document.getElementById('convChart'), {
+    type: 'bar',
+    data: {
+      labels: months,
+      datasets: [
+        { label: 'Conversions', data: monthlyData.map(d => d.conversions), backgroundColor: 'rgba(16,185,129,0.7)', yAxisID: 'y' },
+        { label: 'Cost/Conv (€)', data: monthlyData.map(d => d.costPerConv), type: 'line', borderColor: '#ef4444', backgroundColor: 'transparent', yAxisID: 'y1', tension: 0.3 }
+      ]
+    },
+    options: { ...chartOpts, scales: { y: { beginAtZero: true, position: 'left' }, y1: { beginAtZero: true, position: 'right', grid: { display: false } } } }
+  });
+  
+  // Impressions & Reach
+  if (charts.reach) charts.reach.destroy();
+  charts.reach = new Chart(document.getElementById('reachChart'), {
+    type: 'line',
+    data: {
+      labels: months,
+      datasets: [
+        { label: 'Impressions', data: monthlyData.map(d => d.impressions), borderColor: '#2563eb', tension: 0.3 },
+        { label: 'Reach', data: monthlyData.map(d => d.reach), borderColor: '#8b5cf6', tension: 0.3 }
+      ]
+    },
+    options: chartOpts
+  });
+  
+  // CTR & CPC
+  if (charts.ctr) charts.ctr.destroy();
+  charts.ctr = new Chart(document.getElementById('ctrChart'), {
+    type: 'line',
+    data: {
+      labels: months,
+      datasets: [
+        { label: 'CTR (%)', data: monthlyData.map(d => d.ctr), borderColor: '#f59e0b', tension: 0.3, yAxisID: 'y' },
+        { label: 'CPC (€)', data: monthlyData.map(d => d.cpc), borderColor: '#ef4444', tension: 0.3, yAxisID: 'y1' }
+      ]
+    },
+    options: { ...chartOpts, scales: { y: { beginAtZero: true, position: 'left' }, y1: { beginAtZero: true, position: 'right', grid: { display: false } } } }
+  });
+}
+
+function renderCreatives(month) {
+  const filtered = filterByMonth(creativeData, month)
+    .sort((a, b) => Number(b.Spend || 0) - Number(a.Spend || 0))
+    .slice(0, 24);
+  
+  document.getElementById('creativeGrid').innerHTML = filtered.map(c => {
+    const thumb = c['Thumbnail URL'] || '';
+    const imgHtml = thumb ? `<img src="${thumb}" alt="${c['Ad Name']}" loading="lazy">` : `<div style="height:180px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#aaa;">No Preview</div>`;
+    return `
+      <div class="creative-card">
+        ${imgHtml}
+        <div class="info">
+          <div class="name" title="${c['Ad Name'] || ''}">${c['Ad Name'] || 'Unnamed'}</div>
+          <div class="metrics">
+            <div class="metric"><div class="ml">Spend</div><div class="mv">${fmt(c.Spend || 0, 'money')}</div></div>
+            <div class="metric"><div class="ml">CTR</div><div class="mv">${fmt(c['CTR (Link)'] || c.CTR || 0, 'pct')}</div></div>
+            <div class="metric"><div class="ml">CPM</div><div class="mv">${fmt(c.CPM || 0, 'money')}</div></div>
+            <div class="metric"><div class="ml">Hook Rate</div><div class="mv">${c['Hook Rate'] ? c['Hook Rate'] + '%' : '—'}</div></div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderCampaignTable(month) {
+  const filtered = filterByMonth(campaignData, month).sort((a, b) => Number(b.Spend || 0) - Number(a.Spend || 0));
+  let html = '<thead><tr><th>Campaign</th><th>Spend</th><th>Impr.</th><th>Clicks</th><th>CTR</th><th>CPM</th><th>Conv.</th><th>Cost/Conv</th><th>ROAS</th></tr></thead><tbody>';
+  filtered.forEach(c => {
+    html += `<tr><td>${c['Campaign Name']}</td><td>${fmt(c.Spend, 'money')}</td><td>${fmt(c.Impressions, 'num')}</td><td>${fmt(c.Clicks, 'num')}</td><td>${fmt(c.CTR, 'pct')}</td><td>${fmt(c.CPM, 'money')}</td><td>${c.Conversions}</td><td>${fmt(c['Cost/Conversion'], 'money')}</td><td>${fmt(c.ROAS, 'x')}</td></tr>`;
+  });
+  document.getElementById('campaignTable').innerHTML = html + '</tbody>';
+}
+
+function renderAdsetTable(month) {
+  const filtered = filterByMonth(adsetData, month).sort((a, b) => Number(b.Spend || 0) - Number(a.Spend || 0));
+  let html = '<thead><tr><th>Ad Set</th><th>Campaign</th><th>Spend</th><th>Impr.</th><th>Clicks</th><th>CTR</th><th>CPM</th><th>Conv.</th><th>Cost/Conv</th></tr></thead><tbody>';
+  filtered.forEach(c => {
+    html += `<tr><td>${c['Ad Set Name']}</td><td>${c['Campaign Name']}</td><td>${fmt(c.Spend, 'money')}</td><td>${fmt(c.Impressions, 'num')}</td><td>${fmt(c.Clicks, 'num')}</td><td>${fmt(c.CTR, 'pct')}</td><td>${fmt(c.CPM, 'money')}</td><td>${c.Conversions}</td><td>${fmt(c['Cost/Conversion'], 'money')}</td></tr>`;
+  });
+  document.getElementById('adsetTable').innerHTML = html + '</tbody>';
+}
+
+function showTab(tab) {
+  document.querySelectorAll('.tab-bar button').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  ['creatives', 'campaigns', 'adsets'].forEach(t => {
+    document.getElementById('tab-' + t).style.display = t === tab ? '' : 'none';
+  });
+}
+
+function render() {
+  const month = document.getElementById('monthFilter').value;
+  const compareTo = document.getElementById('compareFilter').value;
+  
+  const current = aggregate(campaignData, month);
+  const compare = compareTo ? aggregate(campaignData, compareTo) : null;
+  
+  renderKPIs(current, compare);
+  renderTrendCharts();
+  renderCreatives(month);
+  renderCampaignTable(month);
+  renderAdsetTable(month);
+}
+
+async function init() {
+  try {
+    [campaignData, adsetData, creativeData] = await Promise.all([
+      fetchSheet('Campaigns'),
+      fetchSheet('Ad Sets'),
+      fetchSheet('Creatives')
+    ]);
+    
+    // Populate month filters
+    const months = [...new Set(campaignData.map(d => d.Monat))].sort();
+    const monthFilter = document.getElementById('monthFilter');
+    const compareFilter = document.getElementById('compareFilter');
+    months.forEach(m => {
+      monthFilter.innerHTML += `<option value="${m}">${m}</option>`;
+      compareFilter.innerHTML += `<option value="${m}">${m}</option>`;
+    });
+    
+    monthFilter.onchange = render;
+    compareFilter.onchange = render;
+    
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('dashboard').style.display = '';
+    
+    render();
+  } catch (e) {
+    document.getElementById('loading').innerHTML = 'Fehler beim Laden: ' + e.message + '<br><br>Bitte stelle sicher, dass die Google Sheet öffentlich freigegeben ist (Ansicht für alle mit Link).';
+  }
+}
+
+init();
+</script>
+</body>
+</html>

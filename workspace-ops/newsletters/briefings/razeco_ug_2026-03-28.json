@@ -1,0 +1,38 @@
+{
+  "briefing_id": "razeco_ug_2026-03-28",
+  "created_at": "2026-02-25T17:05:09.466372",
+  "status": "done",
+  "client": {
+    "name": "Razeco UG",
+    "website": "https://razeco.de",
+    "language": "de"
+  },
+  "topic": {
+    "name": "Buy now, pay later / Free Shipping",
+    "date": "2026-03-28",
+    "briefing": "A \"Buy Now Pay Later\" email is a promotional email that highlights a financing option (Klarna, Afterpay) for customers to purchase products now and pay for them later, with the option to make payments over time. Here are some ideas for what to include in such an email:\nHighlight the benefits of the financing option: Mention the benefits of the financing option, such as the ability to purchase products now and pay for them later, and the option to make payments over time.\nProvide clear information about the financing option: Provide clear and detailed information about the financing option, including the terms and conditions, interest rates, and any fees.\nExplain visually: Using pictures explain what steps a customer needs to make to choose Buy Now Pay Later option (step by step from adding to cart, to checkout)\nIf Buy Now Pay Later is not available - do a free shipping promo.\nThe goal of this email is to promote a financing option (such as Klarna or Afterpay) that allows customers to purchase products now and pay for them later, by breaking down the process visually and highlighting the benefits of the financing option. The email aims to educate the customers about the financing option, including the terms and conditions, interest rates, and any fees, in a clear and concise manner, to encourage them to take advantage of this option to make a purchase."
+  },
+  "copy": {
+    "subject": "Jetzt rasieren, später zahlen! ✨",
+    "preview": "Gönn dir Premium-Rasierer mit Klarna",
+    "headline": "Hol dir dein Rasier-Erlebnis!",
+    "body": [
+      "Stell dir vor, du wachst auf, bereit für den Tag, dein Spiegel strahlt mit dir um die Wette. Dein Geheimnis? Ein Rasierer, der deiner Haut schmeichelt und der Umwelt gerecht wird.",
+      "",
+      "Mit Razeco kannst du jetzt sofort in das Erlebnis eintauchen und später zahlen. Dank Klarna wird aus deinem Wunsch Realität, ohne dein Budget zu sprengen.",
+      "✓ Kaufe jetzt, zahle später – flexibel und bequem",
+      "✓ 99% biobasierte Materialien, TÜV-zertifiziert",
+      "✓ Made in Germany, designed in Switzerland",
+      "Tauche ein in die Welt der Premium-Rasur, die über 12.000 Kunden begeistert. Kein Haken, nur purer Komfort und Stil.",
+      "",
+      "Unsere Klingen sind weltweit die ersten biobasierten und reduzieren deinen CO2-Fußabdruck um 99%. Werde Teil der Revolution und entdecke, warum sogar TikTok uns liebt.",
+      "Verpasse nicht die Chance auf ein umweltfreundliches Rasurerlebnis, das dich jeden Tag neu begeistern wird."
+    ],
+    "cta": "Jetzt entdecken und später zahlen →",
+    "closing": "Auf eine glatte Zukunft<br>Dein Razeco Team",
+    "products_to_show": [
+      "system_bundle",
+      "system_razor_face"
+    ]
+  }
+}

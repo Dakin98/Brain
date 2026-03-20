@@ -1,0 +1,55 @@
+{
+  "briefing_id": "razeco_ug_2026-03-06",
+  "created_at": "2026-02-27T10:17:41.058482",
+  "status": "done",
+  "client": {
+    "name": "Razeco UG",
+    "website": "https://razeco.de",
+    "language": "de"
+  },
+  "topic": {
+    "name": "What to expect from the brand",
+    "date": "2026-03-06",
+    "briefing": "A \"What to Expect When Buying from Us\" email is a way to provide customers with a clear understanding of the buying process and what they can expect when they make a purchase from your brand. This type of email is designed to set customer expectations, ensure a positive buying experience, and build trust and loyalty.\nProvide information on shipping and delivery: Share details on shipping and delivery options, including estimated delivery times and costs.\nExplain returns and exchanges: Clearly outline your company's return and exchange policy, including how customers can initiate a return or exchange and what the process entails.\nHighlight customer service: Let customers know how they can contact customer service, and what kind of support they can expect.\nEmphasize the benefits of buying from you: Highlight the unique benefits of buying from your company, such as a wide selection of products, competitive pricing, fast shipping, money-back guarantee, free returns.\nThe goal of this email is to provide customers with a clear understanding of the buying process when purchasing from your brand. This email is designed to set customer expectations, ensure a positive buying experience, build trust and loyalty, and provide customers with important information about shipping and delivery, returns and exchanges, customer service, and the benefits of buying from your company."
+  },
+  "copy": {
+    "subject": "Was dich bei uns erwartet ⚡",
+    "preview": "Transparenz statt Marketing-Blabla. So läuft's bei Razeco ab.",
+    "headline": "Keine Überraschungen. Nur Klartext.",
+    "body": [
+      "Andere Brands versprechen dir das Blaue vom Himmel. Wir sagen dir einfach, wie's läuft.",
+      "",
+      "**VERSAND & LIEFERUNG**",
+      "Bestellt bis 14 Uhr → Versand am selben Tag. DHL bringt's in 1-2 Werktagen zu dir. Kostenloser Versand ab 35€, darunter 4,99€.",
+      "",
+      "**RÜCKGABE & UMTAUSCH**",
+      "30 Tage Geld-zurück-Garantie. Ohne Wenn und Aber. Einfach eine Mail an hello@razeco.com und wir regeln das unkompliziert.",
+      "",
+      "**CUSTOMER SERVICE**",
+      "Echte Menschen, keine Bots. Antworten innerhalb von 24h. WhatsApp, Mail oder Instagram – such dir aus, was dir passt.",
+      "",
+      "**WARUM RAZECO?**",
+      "✓ 99% biobasiert – TÜV Austria zertifiziert",
+      "✓ Made in Germany, Designed in Switzerland",
+      "✓ Schwedische Premium-Stahlklingen",
+      "✓ 12.000+ zufriedene Kunden",
+      "✓ As seen in FAZ, Handelsblatt, Tagesspiegel",
+      "",
+      "Kein Marketing-Geschwätz. Nur Premium-Qualität, die hält was sie verspricht.",
+      "",
+      "Bereit für den Wechsel?"
+    ],
+    "cta": "Jetzt entdecken →",
+    "closing": "Transparent & ehrlich,<br>Team Razeco",
+    "products_to_show": [
+      "system_bundle",
+      "system_razor_face"
+    ]
+  },
+  "klaviyo": {
+    "success": true,
+    "template_id": "XhSMv5",
+    "campaign_id": "01KJF67EGMSBZFY2KKAK9TJG9B",
+    "url": "https://www.klaviyo.com/campaign/01KJF67EGMSBZFY2KKAK9TJG9B/edit"
+  }
+}
