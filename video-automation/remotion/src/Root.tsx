@@ -1,0 +1,22 @@
+import React from 'react';
+import { Composition } from 'remotion';
+import { Video } from './Video';
+
+export const RemotionRoot: React.FC = () => {
+  return (
+    <>
+      <Composition
+        id="AutoEditVideo"
+        component={Video}
+        durationInFrames={900}
+        fps={30}
+        width={1080}
+        height={1920}
+        defaultProps={{
+          analysisPath: 'http://localhost:8000/analysis.json',
+          mainVideo: 'http://localhost:8000/input.mp4',
+        }}
+      />
+    </>
+  );
+};

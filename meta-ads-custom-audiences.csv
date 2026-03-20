@@ -1,0 +1,27 @@
+Audience Name,Typ,Quelle/Event,Zeitfenster,Location,Größe,Nutzung,Priorität,Exclusions
+Purchasers 30D,Website,Purchase,30 Tage,Deutschland,-,Exclusion / Upsell,HOT,-
+Purchasers 180D,Website,Purchase,180 Tage,Deutschland,-,Lookalike-Source / Retention,HOT,-
+Initiate Checkout 30D,Website,InitiateCheckout,30 Tage,Deutschland,-,Hot Retargeting,HOT,-
+Add to Cart 30D,Website,AddToCart,30 Tage,Deutschland,-,Hot Retargeting,HOT,-
+Add to Cart 7D,Website,AddToCart,7 Tage,Deutschland,-,Sehr hot Retargeting,HOT,-
+Website Visitors 30D,Website,All Website Visitors,30 Tage,Deutschland,-,Warm Retargeting,WARM,-
+Website Visitors 14D,Website,All Website Visitors,14 Tage,Deutschland,-,Frisch warm,WARM,-
+Website Visitors 7D,Website,All Website Visitors,7 Tage,Deutschland,-,Sehr warm,WARM,-
+Product Page Viewers 30D,Website,ViewContent (URL: /product/),30 Tage,Deutschland,-,Hochinteressiert,WARM,-
+Video Views 95% 30D,Engagement,Video 95% watched,30 Tage,Deutschland,-,Lookalike-Source,WARM,-
+Video Views 75% 30D,Engagement,Video 75% watched,30 Tage,Deutschland,-,Engagiert,WARM,-
+Video Views 50% 30D,Engagement,Video 50% watched,30 Tage,Deutschland,-,Retargeting,WARM,-
+IG Engagers 30D,Engagement,Instagram Interactions,30 Tage,Deutschland,-,Günstiges Retargeting,WARM,-
+FB Engagers 30D,Engagement,Facebook Interactions,30 Tage,Deutschland,-,Günstiges Retargeting,WARM,-
+Lead Form Opener 30D,Engagement,Lead Form Open,30 Tage,Deutschland,-,Lead-Nurturing,WARM,-
+LL 1% Purchasers 180D,Lookalike,Purchasers 180D,-,Deutschland,1%,Beste Cold-Audience,COLD,-
+LL 1-3% Purchasers 180D,Lookalike,Purchasers 180D,-,Deutschland,1-3%,Größeres Volumen,COLD,-
+LL 5-10% Purchasers 180D,Lookalike,Purchasers 180D,-,Deutschland,5-10%,Skalierung,COLD,-
+LL 1% Video 95% 30D,Lookalike,Video Views 95% 30D,-,Deutschland,1%,Alternative Source,COLD,-
+LL 1-3% Video 95% 30D,Lookalike,Video Views 95% 30D,-,Deutschland,1-3%,Alternative Source,COLD,-
+,,,,,,,,
+EXCLUSIONS (von Cold/Warm ausschließen),,,,,,,,
+Purchasers 30D EXCL,Exclusion,Purchase,30 Tage,Deutschland,-,Von Cold & Warm ausschließen,EXCL,-
+Purchasers 7D EXCL,Exclusion,Purchase,7 Tage,Deutschland,-,Von Retargeting ausschließen,EXCL,-
+ATC 30D EXCL,Exclusion,AddToCart,30 Tage,Deutschland,-,Von Cold Traffic ausschließen,EXCL,-
+Visitors 30D EXCL,Exclusion,All Website Visitors,30 Tage,Deutschland,-,Von Cold Lookalikes ausschließen,EXCL,-
